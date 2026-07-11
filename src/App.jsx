@@ -47,6 +47,52 @@ const EVENTS = [
 
 const STATUS_COLOR = { open: C.open, inProgress: C.progress, closed: C.closed };
 
+/* ---------- Official service destinations ---------- */
+const LINKS = {
+  s1: "https://www.sf311.org",
+  s2: "https://www.sfmta.com",
+  s3: "https://www.getcalfresh.org",
+  s4: "https://housing.sfgov.org",
+};
+
+/* ---------- Bay Bridge etching ---------- */
+function BayBridge() {
+  return (
+    <div aria-hidden="true" style={{ margin: "40px 0 0" }}>
+      <svg viewBox="0 0 800 110" style={{ width: "100%", display: "block" }}>
+        {/* deck */}
+        <line x1="0" y1="88" x2="800" y2="88" stroke={C.ink} strokeWidth="2" />
+        <line x1="0" y1="94" x2="800" y2="94" stroke={C.ink} strokeWidth="0.75" />
+        {/* towers */}
+        {[250, 550].map((tx) => (
+          <g key={tx} stroke={C.ink} strokeWidth="2" fill="none">
+            <line x1={tx - 7} y1="18" x2={tx - 7} y2="88" />
+            <line x1={tx + 7} y1="18" x2={tx + 7} y2="88" />
+            <line x1={tx - 10} y1="18" x2={tx + 10} y2="18" strokeWidth="3" />
+            <line x1={tx - 7} y1="36" x2={tx + 7} y2="36" strokeWidth="1.25" />
+            <line x1={tx - 7} y1="58" x2={tx + 7} y2="58" strokeWidth="1.25" />
+          </g>
+        ))}
+        {/* cables */}
+        <g stroke={C.gold} strokeWidth="1.5" fill="none">
+          <path d="M0,52 Q120,86 243,20" />
+          <path d="M257,20 Q400,82 543,20" />
+          <path d="M557,20 Q680,86 800,52" />
+        </g>
+        {/* suspenders, center span */}
+        <g stroke={C.gold} strokeWidth="0.75">
+          <line x1="325" y1="44" x2="325" y2="88" />
+          <line x1="400" y1="51" x2="400" y2="88" />
+          <line x1="475" y1="44" x2="475" y2="88" />
+        </g>
+      </svg>
+      <div style={{ ...caps, fontSize: 9, color: C.muted, textAlign: "center", marginTop: 10, letterSpacing: "0.22em" }}>
+        San Francisco – Oakland Bay Bridge
+      </div>
+    </div>
+  );
+}
+
 /* ---------- Pieces ---------- */
 function SectionLabel({ children }) {
   return (
@@ -57,13 +103,17 @@ function SectionLabel({ children }) {
   );
 }
 
-function ServiceRow({ title, desc, rtl }) {
+function ServiceRow({ title, desc, rtl, href }) {
   const [hover, setHover] = useState(false);
   return (
-    <button
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
+        textDecoration: "none",
         width: "100%",
         textAlign: "start",
         padding: "20px 0",
@@ -92,7 +142,7 @@ function ServiceRow({ title, desc, rtl }) {
       <span style={{ ...serif, color: hover ? C.gold : C.muted, fontSize: 20, transition: "color 0.2s" }}>
         {rtl ? "←" : "→"}
       </span>
-    </button>
+    </a>
   );
 }
 
@@ -194,16 +244,16 @@ export default function App() {
           <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, marginTop: 16, lineHeight: 1.55, maxWidth: 460 }}>
             {t.intro}
           </p>
-          <div style={{ height: 1, width: 56, background: C.goldLine, marginTop: 40 }} />
+          <BayBridge />
         </section>
 
         <section style={{ paddingBottom: 64, ...fade(0.3) }}>
           <SectionLabel>{t.servicesLabel}</SectionLabel>
           <div style={{ borderTop: `1px solid ${C.hairline}` }}>
-            <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} />
-            <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} />
-            <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} />
-            <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} />
+            <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} href={LINKS.s1} />
+            <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} href={LINKS.s2} />
+            <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} href={LINKS.s3} />
+            <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} href={LINKS.s4} />
           </div>
         </section>
 
