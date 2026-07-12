@@ -100,9 +100,6 @@ function SectionLabel({ children }) {
     </div>
   );
 }
-  );
-}
-
 function ServiceRow({ title, desc, rtl, href }) {
   const [hover, setHover] = useState(false);
   return (
