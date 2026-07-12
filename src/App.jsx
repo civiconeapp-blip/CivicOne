@@ -100,6 +100,8 @@ function SectionLabel({ children }) {
     </div>
   );
 }
+  );
+}
 
 function ServiceRow({ title, desc, rtl, href }) {
   const [hover, setHover] = useState(false);
@@ -150,6 +152,7 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [requests, setRequests] = useState(null);
   const [fetchError, setFetchError] = useState(false);
+  const [pulse, setPulse] = useState(null);
 
   const t = T[lang];
   const rtl = lang === "ar";
@@ -185,6 +188,38 @@ export default function App() {
       }
     }
     load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadPulse() {
+      try {
+        const since = new Date(Date.now() - 7 * 24 * 3600 * 1000)
+          .toISOString()
+          .slice(0, 19);
+                const params = new URLSearchParams({
+          $select: "service_name,count(*) as n",
+          $where: "supervisor_district=5 AND requested_datetime > '" + since + "'",
+          $group: "service_name",
+          $order: "n DESC",
+          $limit: "50",
+        });
+        const token = import.meta.env.VITE_DATASF_TOKEN;
+        if (token) params.set("$$app_token", token);
+        const res = await fetch(
+          "https://data.sfgov.org/resource/vw6y-z8j6.json?" + params.toString()
+        );
+        if (!res.ok) return;
+        const rows = await res.json();
+        if (cancelled || !Array.isArray(rows) || rows.length === 0) return;
+        const total = rows.reduce((s, r) => s + Number(r.n || 0), 0);
+        if (total > 0) setPulse({ n: total, c: rows[0].service_name });
+      } catch (e) {}
+    }
+    loadPulse();
     return () => {
       cancelled = true;
     };
@@ -265,6 +300,11 @@ export default function App() {
           <p style={{ ...sans, fontSize: 11.5, color: C.muted, margin: "-16px 0 20px" }}>
             {fetchError ? t.ledgerError : t.ledgerNote}
           </p>
+             {pulse && (
+            <p dir="auto" style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.ink, margin: "0 0 22px" }}>
+              {t.pulse.replace("{n}", pulse.n.toLocaleString()).replace("{c}", pulse.c)}
+            </p>
+          )}
 
           {requests === null && (
             <p style={{ ...serif, fontStyle: "italic", fontSize: 15, color: C.muted }}>{t.loading}</p>
