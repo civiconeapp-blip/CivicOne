@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { LANGS, T } from "./i18n.js";
+import ReportForm from "./ReportForm.jsx";
+
 
 /* ---------- Design tokens: "City Briefing" system ---------- */
 const C = {
@@ -256,7 +258,9 @@ export default function App() {
           </div>
         </section>
 
-        <section style={{ paddingBottom: 64, ...fade(0.4) }}>
+               <ReportForm t={t} />
+
+ <section style={{ paddingBottom: 64, ...fade(0.4) }}>
           <SectionLabel>{t.ledgerLabel}</SectionLabel>
           <p style={{ ...sans, fontSize: 11.5, color: C.muted, margin: "-16px 0 20px" }}>
             {fetchError ? t.ledgerError : t.ledgerNote}
