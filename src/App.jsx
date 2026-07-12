@@ -38,13 +38,6 @@ function statusKey(statusDescription) {
   return "open";
 }
 
-/* ---------- Static content ---------- */
-const EVENTS = [
-  { day: "11", name: "D5 Community Resource Fair", place: "Ella Hill Hutch Community Center" },
-  { day: "19", name: "Fillmore Jazz on the Block", place: "Fillmore St between Eddy & Turk" },
-  { day: "24", name: "Tenderloin Family Movie Night", place: "Boeddeker Park" },
-];
-
 const STATUS_COLOR = { open: C.open, inProgress: C.progress, closed: C.closed };
 
 /* ---------- Official service destinations ---------- */
@@ -117,14 +110,14 @@ function ServiceRow({ title, desc, rtl, href }) {
       onMouseLeave={() => setHover(false)}
       style={{
         textDecoration: "none",
-        width: "100%",
+                width: "100%",
         textAlign: "start",
         padding: "20px 0",
         display: "flex",
         alignItems: "baseline",
         justifyContent: "space-between",
         gap: 24,
-                borderBottom: `1px solid ${C.hairline}`,
+        borderBottom: `1px solid ${C.hairline}`,
       }}
     >
       <div>
@@ -230,7 +223,7 @@ export default function App() {
                     fontWeight: lang === l.code ? 600 : 400,
                     borderBottom: lang === l.code ? `1.5px solid ${C.gold}` : "1.5px solid transparent",
                     transition: "all 0.2s",
-                  }}
+                                      }}
                 >
                   {l.label}
                 </button>
@@ -247,7 +240,7 @@ export default function App() {
           <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, marginTop: 16, lineHeight: 1.55, maxWidth: 460 }}>
             {t.intro}
           </p>
-                    <BayBridge />
+          <BayBridge />
         </section>
 
         <section style={{ paddingBottom: 64, ...fade(0.3) }}>
@@ -313,35 +306,6 @@ export default function App() {
               ))}
             </div>
           )}
-        </section>
-
-        <section style={{ paddingBottom: 64, ...fade(0.5) }}>
-          <SectionLabel>{t.eventsLabel}</SectionLabel>
-          {EVENTS.map((e, i) => (
-            <div
-              key={e.name}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "72px 1fr",
-                gap: 24,
-                padding: "20px 0",
-                borderBottom: i < EVENTS.length - 1 ? `1px solid ${C.hairline}` : "none",
-              }}
-            >
-              <div>
-                <div style={{ ...serif, fontSize: 30, fontWeight: 500, color: C.ink, lineHeight: 1 }}>{e.day}</div>
-                <div style={{ ...caps, fontSize: 9.5, color: C.gold, marginTop: 4 }}>{t.jul}</div>
-              </div>
-              <div>
-                <div style={{ ...serif, fontSize: 20, fontWeight: 500, color: C.ink }}>{e.name}</div>
-                <div style={{ ...sans, fontSize: 13, color: C.muted, marginTop: 4 }}>{e.place}</div>
-                <div style={{ ...caps, fontSize: 9.5, color: C.closed, marginTop: 8, display: "flex", alignItems: "center", gap: 6 }}>
-                  <span style={{ width: 5, height: 5, borderRadius: 99, background: C.closed, display: "inline-block" }} />
-                  {t.verified}
-                </div>
-              </div>
-            </div>
-          ))}
         </section>
 
         <section style={fade(0.6)}>
