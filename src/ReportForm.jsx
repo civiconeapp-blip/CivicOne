@@ -79,12 +79,16 @@ export default function ReportForm({ t }) {
     setError(false);
     setCopied(false);
     setReady(true);
+        if (window.umami) window.umami.track("report_prepared", { category: cat });
+
   };
 
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(summaryText());
       setCopied(true);
+            if (window.umami) window.umami.track("report_copied", { category: cat });
+
     } catch (e) {
       setCopied(false);
     }
@@ -177,6 +181,7 @@ export default function ReportForm({ t }) {
             </button>
             <a
               href="https://www.sf311.org"
+                            onClick={() => { if (window.umami) window.umami.track("report_finished", { category: cat }); }}
               target="_blank"
               rel="noopener noreferrer"
               style={{
