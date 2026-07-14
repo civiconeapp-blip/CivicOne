@@ -107,6 +107,7 @@ function ServiceRow({ title, desc, rtl, href }) {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
+            onClick={() => { if (window.umami) window.umami.track("service_tap", { service: href }); }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
@@ -248,7 +249,8 @@ export default function App() {
               {LANGS.map((l) => (
                 <button
                   key={l.code}
-                  onClick={() => setLang(l.code)}
+                                    onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
+
                   style={{
                     ...sans,
                     fontSize: 12.5,
