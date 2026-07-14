@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route, Link, useParams, Navigate } from "react-router-dom";
 import { LANGS, T } from "./i18n.js";
 import ReportForm from "./ReportForm.jsx";
+import { DISTRICTS, getDistrict } from "./districts.js";
 
 
 /* ---------- Design tokens: "City Briefing" system ---------- */
@@ -29,9 +31,9 @@ const caps = {
 };
 
 /* ---------- Live DataSF 311 (District 5) ---------- */
-const DATASF_URL =
+const datasfUrl = (districtId) =>
   "https://data.sfgov.org/resource/vw6y-z8j6.json" +
-  "?$limit=6&$order=requested_datetime%20DESC&supervisor_district=5";
+  "?$limit=6&$order=requested_datetime%20DESC&supervisor_district=" + districtId;
 
 function statusKey(statusDescription) {
   const s = (statusDescription || "").toLowerCase();
@@ -144,9 +146,10 @@ function ServiceRow({ title, desc, rtl, href }) {
   );
 }
 
-/* ---------- App ---------- */
-export default function App() {
-  const [lang, setLang] = useState("en");
+/* ---------- District view (the full page for one district) ---------- */
+function DistrictView({ district, lang, setLang }) {
+  const d = district.id;
+  const featured = !!district.featured;
   const [loaded, setLoaded] = useState(false);
   const [requests, setRequests] = useState(null);
   const [fetchError, setFetchError] = useState(false);
@@ -164,7 +167,8 @@ export default function App() {
     async function load() {
       try {
         const token = import.meta.env.VITE_DATASF_TOKEN;
-        const url = token ? `${DATASF_URL}&$$app_token=${token}` : DATASF_URL;
+        const base = datasfUrl(d);
+        const url = token ? `${base}&$$app_token=${token}` : base;
         const res = await fetch(url);
         if (!res.ok) throw new Error(`DataSF responded ${res.status}`);
         const rows = await res.json();
@@ -173,7 +177,7 @@ export default function App() {
           rows.map((r) => ({
             id: r.service_request_id || "—",
             name: r.service_name || r.service_subtype || "311 request",
-            loc: r.address || r.neighborhoods_sffind_boundaries || "District 5",
+            loc: r.address || r.neighborhoods_sffind_boundaries || t.districtFmt.replace("{n}", d),
             status: statusKey(r.status_description),
             date: r.requested_datetime ? r.requested_datetime.slice(0, 10) : "",
           }))
@@ -185,11 +189,13 @@ export default function App() {
         }
       }
     }
+    setRequests(null);
+    setFetchError(false);
     load();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [d]);
 
   useEffect(() => {
     let cancelled = false;
@@ -200,7 +206,7 @@ export default function App() {
           .slice(0, 19);
                 const params = new URLSearchParams({
           $select: "service_name,count(*) as n",
-          $where: "supervisor_district=5 AND requested_datetime > '" + since + "'",
+          $where: "supervisor_district=" + d + " AND requested_datetime > '" + since + "'",
           $group: "service_name",
           $order: "n DESC",
           $limit: "50",
@@ -217,11 +223,12 @@ export default function App() {
         if (total > 0) setPulse({ n: total, c: rows[0].service_name });
       } catch (e) {}
     }
+    setPulse(null);
     loadPulse();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [d]);
 
   const fade = (delay) => ({
     opacity: loaded ? 1 : 0,
@@ -238,7 +245,9 @@ export default function App() {
         <header style={{ paddingTop: 48, ...fade(0) }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
             <span style={{ ...caps, fontSize: 10.5, color: C.muted }}>{t.city}</span>
-            <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>{t.district}</span>
+            <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>
+              {featured ? t.district : t.districtFmt.replace("{n}", d)}
+            </span>
           </div>
           <div style={{ height: 1, background: C.ink, margin: "16px 0" }} />
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
@@ -274,7 +283,7 @@ export default function App() {
             {t.hello}
           </h2>
           <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, marginTop: 16, lineHeight: 1.55, maxWidth: 460 }}>
-            {t.intro}
+            {featured ? t.intro : t.introGeneric}
           </p>
           <BayBridge />
         </section>
@@ -286,10 +295,19 @@ export default function App() {
             <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} href={LINKS.s2} />
             <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} href={LINKS.s3} />
             <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} href={LINKS.s4} />
-            <ServiceRow title={t.s5} desc={t.s5d} rtl={rtl} href={LINKS.s5} />
-            <ServiceRow title={t.s6} desc={t.s6d} rtl={rtl} href={LINKS.s6} />
-            <ServiceRow title={t.s7} desc={t.s7d} rtl={rtl} href={LINKS.s7} />
+            {featured && (
+              <>
+                <ServiceRow title={t.s5} desc={t.s5d} rtl={rtl} href={LINKS.s5} />
+                <ServiceRow title={t.s6} desc={t.s6d} rtl={rtl} href={LINKS.s6} />
+                <ServiceRow title={t.s7} desc={t.s7d} rtl={rtl} href={LINKS.s7} />
+              </>
+            )}
           </div>
+          {!featured && (
+            <p style={{ ...serif, fontStyle: "italic", fontSize: 15, color: C.muted, marginTop: 20 }}>
+              {t.programsSoon}
+            </p>
+          )}
         </section>
 
                <ReportForm t={t} />
@@ -297,11 +315,11 @@ export default function App() {
  <section style={{ paddingBottom: 64, ...fade(0.4) }}>
           <SectionLabel>{t.ledgerLabel}</SectionLabel>
           <p style={{ ...sans, fontSize: 11.5, color: C.muted, margin: "-16px 0 20px" }}>
-            {fetchError ? t.ledgerError : t.ledgerNote}
+            {fetchError ? t.ledgerError : featured ? t.ledgerNote : t.ledgerNoteAny.replace("{d}", d)}
           </p>
              {pulse && (
             <p dir="auto" style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.ink, margin: "0 0 22px" }}>
-              {t.pulse.replace("{n}", pulse.n.toLocaleString()).replace("{c}", pulse.c)}
+              {(featured ? t.pulse : t.pulseAny.replace("{d}", d)).replace("{n}", pulse.n.toLocaleString()).replace("{c}", pulse.c)}
             </p>
           )}
 
@@ -356,12 +374,50 @@ export default function App() {
             <div style={{ position: "absolute", top: 0, insetInlineStart: 0, width: "100%", height: 3, background: C.gold }} />
             <span style={{ ...caps, fontSize: 10.5, color: C.goldLine }}>{t.districtLabel}</span>
             <h3 style={{ ...serif, fontSize: 30, color: C.cream, fontWeight: 500, marginTop: 10 }}>
-              {t.supervisor} Bilal Mahmood
+              {t.supervisor} {district.supervisor}
             </h3>
-            <p style={{ ...sans, fontSize: 12.5, color: "rgba(245,242,234,0.65)", marginTop: 8 }}>{t.hours}</p>
-            <p style={{ ...serif, fontStyle: "italic", fontSize: 14.5, color: "rgba(245,242,234,0.6)", marginTop: 24 }}>
-              {t.hoods}
-            </p>
+            {featured && (
+              <p style={{ ...sans, fontSize: 12.5, color: "rgba(245,242,234,0.65)", marginTop: 8 }}>{t.hours}</p>
+            )}
+            {district.neighborhoods && (
+              <p style={{ ...serif, fontStyle: "italic", fontSize: 14.5, color: "rgba(245,242,234,0.6)", marginTop: 24 }}>
+                {district.neighborhoods}
+              </p>
+            )}
+            <a
+              href={district.page}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ ...sans, fontSize: 12.5, color: C.goldLine, display: "inline-block", marginTop: 20, textDecoration: "none", borderBottom: `1px solid ${C.goldLine}` }}
+            >
+              {t.officialPage} {rtl ? "←" : "→"}
+            </a>
+          </div>
+        </section>
+
+        <section style={{ paddingTop: 56, ...fade(0.65) }}>
+          <SectionLabel>{t.pickerLabel}</SectionLabel>
+          <p style={{ ...sans, fontSize: 12.5, color: C.muted, margin: "-16px 0 20px" }}>{t.pickerHint}</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
+            {DISTRICTS.map((dd) => (
+              <Link
+                key={dd.id}
+                to={"/district/" + dd.id}
+                onClick={() => { if (window.umami) window.umami.track("district_switch", { district: dd.id }); }}
+                style={{
+                  textDecoration: "none",
+                  border: `1px solid ${dd.id === d ? C.gold : C.hairline}`,
+                  background: dd.id === d ? C.cream : "transparent",
+                  padding: "14px 14px",
+                  minHeight: 44,
+                }}
+              >
+                <div style={{ ...caps, fontSize: 10, color: dd.id === d ? C.gold : C.muted }}>
+                  {t.districtFmt.replace("{n}", dd.id)}
+                </div>
+                <div style={{ ...serif, fontSize: 15.5, color: C.ink, marginTop: 4 }}>{dd.supervisor}</div>
+              </Link>
+            ))}
           </div>
         </section>
 
@@ -375,5 +431,28 @@ export default function App() {
         </footer>
       </div>
     </div>
+  );
+}
+
+/* ---------- Route wrapper: reads :id, guards invalid ---------- */
+function DistrictRoute({ lang, setLang }) {
+  const { id } = useParams();
+  const district = getDistrict(id);
+  if (!district) return <Navigate to="/" replace />;
+  return <DistrictView key={district.id} district={district} lang={lang} setLang={setLang} />;
+}
+
+/* ---------- App: router + shared language state ---------- */
+export default function App() {
+  const [lang, setLang] = useState("en");
+  const home = getDistrict(5);
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<DistrictView key="home" district={home} lang={lang} setLang={setLang} />} />
+        <Route path="/district/:id" element={<DistrictRoute lang={lang} setLang={setLang} />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
