@@ -372,7 +372,6 @@ export default function App() {
             <div style={{ height: 1, width: 40, background: C.goldLine }} />
                       </div>
           <p style={{ ...sans, fontSize: 10.5, color: C.muted, marginTop: 14 }}>{t.privacy}</p>
-          </div>
         </footer>
       </div>
     </div>
