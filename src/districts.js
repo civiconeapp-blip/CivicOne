@@ -6,10 +6,9 @@
  * (2, 4, 6, 8, 10) are up for election November 2026 — re-verify names
  * in January 2027.
  *
- * `page` links: only D5's deep link has been individually verified.
- * All others point to the verified sfbos.org root until each pattern
- * URL is tap-checked (see /docs verification checklist). Never ship an
- * unverified deep link.
+ * `page` links: all 11 deep links tap-verified by Amal on 2026-07-13.
+ * Re-verify after any supervisor change (sfbos.org URLs embed the
+ * supervisor's name). Never ship an unverified deep link.
  *
  * `neighborhoods`: only listed where verified from an official source.
  * D5 list is from the official sfbos.org District 5 page.
@@ -18,10 +17,10 @@
 export const SFBOS_ROOT = "https://sfbos.org";
 
 export const DISTRICTS = [
-  { id: 1,  supervisor: "Connie Chan",       page: SFBOS_ROOT, neighborhoods: null },
-  { id: 2,  supervisor: "Stephen Sherrill",  page: SFBOS_ROOT, neighborhoods: null },
-  { id: 3,  supervisor: "Danny Sauter",      page: SFBOS_ROOT, neighborhoods: null },
-  { id: 4,  supervisor: "Alan Wong",         page: SFBOS_ROOT, neighborhoods: null },
+  { id: 1,  supervisor: "Connie Chan",       page: "https://sfbos.org/supervisor-chan-district-1", neighborhoods: null },
+  { id: 2,  supervisor: "Stephen Sherrill",  page: "https://sfbos.org/supervisor-sherrill-district-2", neighborhoods: null },
+  { id: 3,  supervisor: "Danny Sauter",      page: "https://sfbos.org/supervisor-sauter-district-3", neighborhoods: null },
+  { id: 4,  supervisor: "Alan Wong",         page: "https://sfbos.org/supervisor-wong-district-4", neighborhoods: null },
   {
     id: 5,
     supervisor: "Bilal Mahmood",
@@ -36,12 +35,12 @@ export const DISTRICTS = [
     },
     featured: true, // pilot district — gets verified programs section
   },
-  { id: 6,  supervisor: "Matt Dorsey",       page: SFBOS_ROOT, neighborhoods: null },
-  { id: 7,  supervisor: "Myrna Melgar",      page: SFBOS_ROOT, neighborhoods: null },
-  { id: 8,  supervisor: "Rafael Mandelman",  page: SFBOS_ROOT, neighborhoods: null },
-  { id: 9,  supervisor: "Jackie Fielder",    page: SFBOS_ROOT, neighborhoods: null },
-  { id: 10, supervisor: "Shamann Walton",    page: SFBOS_ROOT, neighborhoods: null },
-  { id: 11, supervisor: "Chyanne Chen",      page: SFBOS_ROOT, neighborhoods: null },
+  { id: 6,  supervisor: "Matt Dorsey",       page: "https://sfbos.org/supervisor-dorsey-district-6", neighborhoods: null },
+  { id: 7,  supervisor: "Myrna Melgar",      page: "https://sfbos.org/supervisor-melgar-district-7", neighborhoods: null },
+  { id: 8,  supervisor: "Rafael Mandelman",  page: "https://sfbos.org/supervisor-mandelman-district-8", neighborhoods: null },
+  { id: 9,  supervisor: "Jackie Fielder",    page: "https://sfbos.org/supervisor-fielder-district-9", neighborhoods: null },
+  { id: 10, supervisor: "Shamann Walton",    page: "https://sfbos.org/supervisor-walton-district-10", neighborhoods: null },
+  { id: 11, supervisor: "Chyanne Chen",      page: "https://sfbos.org/supervisor-chen-district-11", neighborhoods: null },
 ];
 
 export function getDistrict(id) {
