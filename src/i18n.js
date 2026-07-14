@@ -64,6 +64,7 @@ export const T = {
     hours: "Office hours — Friday, 10 a.m. to noon · City Hall, Room 244",
     hoods: "Tenderloin · Hayes Valley · Fillmore · Japantown · Western Addition",
     footer: "Civic One — built for the residents of San Francisco",
+        privacy: "We count visits, never people. No cookies, no personal information.",
     jul: "July",
   },
   es: {
@@ -123,6 +124,7 @@ export const T = {
     hours: "Horario — viernes, 10 a.m. a mediodía · City Hall, Sala 244",
     hoods: "Tenderloin · Hayes Valley · Fillmore · Japantown · Western Addition",
     footer: "Civic One — hecho para los residentes de San Francisco",
+        privacy: "Contamos visitas, nunca personas. Sin cookies, sin información personal.",
     jul: "Julio",
   },
   zh: {
@@ -181,6 +183,7 @@ export const T = {
     hours: "办公时间——周五上午10点至中午 · 市政厅244室",
     hoods: "田德隆 · 海斯谷 · 菲尔莫 · 日本城 · 西增区",
     footer: "Civic One——为旧金山居民而建",
+        privacy: "我们只统计访问量，绝不识别个人。无 Cookie，不收集个人信息。",
     jul: "七月",
   },
   vi: {
@@ -240,6 +243,7 @@ export const T = {
     hours: "Giờ làm việc — Thứ Sáu, 10 giờ sáng đến trưa · Tòa Thị chính, Phòng 244",
     hoods: "Tenderloin · Hayes Valley · Fillmore · Japantown · Western Addition",
     footer: "Civic One — xây dựng cho cư dân San Francisco",
+        privacy: "Chúng tôi đếm lượt truy cập, không bao giờ theo dõi cá nhân. Không cookie, không thông tin cá nhân.",
     jul: "Tháng 7",
   },
   ar: {
@@ -298,6 +302,7 @@ export const T = {
     hours: "ساعات المكتب — الجمعة، ١٠ صباحاً حتى الظهر · قاعة المدينة، غرفة ٢٤٤",
     hoods: "تندرلوين · هيز فالي · فيلمور · جابان تاون · ويسترن أديشن",
     footer: "سيفيك ون — بُني لسكان سان فرانسيسكو",
+        privacy: "نحصي الزيارات، لا الأشخاص. بدون كوكيز، وبدون معلومات شخصية.",
     jul: "يوليو",
   },
 };
