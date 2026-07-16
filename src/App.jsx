@@ -149,6 +149,47 @@ function ServiceRow({ title, desc, rtl, href }) {
   );
 }
 
+/* ---------- Internal guide link row (styled like ServiceRow, routes via Link) ---------- */
+function GuideRow({ title, desc, rtl, to }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <Link
+      to={to}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{
+        textDecoration: "none",
+        width: "100%",
+        textAlign: "start",
+        padding: "20px 0",
+        display: "flex",
+        alignItems: "baseline",
+        justifyContent: "space-between",
+        gap: 24,
+        borderBottom: `1px solid ${C.hairline}`,
+      }}
+    >
+      <div>
+        <span
+          style={{
+            ...serif,
+            fontSize: 21,
+            fontWeight: 500,
+            color: C.ink,
+            borderBottom: hover ? `1px solid ${C.gold}` : "1px solid transparent",
+            transition: "border-color 0.2s",
+          }}
+        >
+          {title}
+        </span>
+        <div style={{ ...sans, fontSize: 13, color: C.muted, marginTop: 5 }}>{desc}</div>
+      </div>
+      <span style={{ ...serif, color: hover ? C.gold : C.muted, fontSize: 20, transition: "color 0.2s" }}>
+        {rtl ? "←" : "→"}
+      </span>
+    </Link>
+  );
+}
 /* ---------- District view (the full page for one district) ---------- */
 function DistrictView({ district, lang, setLang }) {
   const d = district.id;
