@@ -288,6 +288,33 @@ function DistrictView({ district, lang, setLang }) {
           <BayBridge />
         </section>
 
+        <section style={{ paddingBottom: 56, ...fade(0.22) }} aria-label={t.r311Label}>
+          <div style={{ background: C.navy, padding: "26px 26px 28px" }}>
+            <div style={{ ...caps, fontSize: 10.5, color: C.goldLine }}>{t.r311Label}</div>
+            <p style={{ ...serif, fontSize: 17, fontStyle: "italic", color: "rgba(245,242,234,0.75)", margin: "10px 0 18px", lineHeight: 1.5 }}>
+              {t.r311Sub}
+            </p>
+            <Link
+              to={"/district/" + d + "/report"}
+              aria-label={t.reportLabel}
+              onClick={() => { if (window.umami) window.umami.track("report_cta", { district: d }); }}
+              style={{
+                ...caps,
+                display: "inline-block",
+                fontSize: 12,
+                background: C.gold,
+                color: C.navy,
+                padding: "15px 26px",
+                minHeight: 44,
+                boxSizing: "border-box",
+                textDecoration: "none",
+              }}
+            >
+              {t.reportLabel} {rtl ? "←" : "→"}
+            </Link>
+          </div>
+        </section>
+
         <section style={{ paddingBottom: 64, ...fade(0.3) }}>
           <SectionLabel>{t.servicesLabel}</SectionLabel>
           <div style={{ borderTop: `1px solid ${C.hairline}` }}>
@@ -309,8 +336,6 @@ function DistrictView({ district, lang, setLang }) {
             </p>
           )}
         </section>
-
-               <ReportForm t={t} />
 
  <section style={{ paddingBottom: 64, ...fade(0.4) }}>
           <SectionLabel>{t.ledgerLabel}</SectionLabel>
@@ -434,6 +459,79 @@ function DistrictView({ district, lang, setLang }) {
   );
 }
 
+/* ---------- Dedicated 311 page ---------- */
+function Report311Page({ district, lang, setLang }) {
+  const d = district.id;
+  const t = T[lang];
+  const rtl = lang === "ar";
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  return (
+    <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
+      <div dir={rtl ? "rtl" : "ltr"} style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 80px" }}>
+        <header style={{ paddingTop: 48 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <span style={{ ...caps, fontSize: 10.5, color: C.muted }}>{t.city}</span>
+            <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>{t.districtFmt.replace("{n}", d)}</span>
+          </div>
+          <div style={{ height: 1, background: C.ink, margin: "16px 0" }} />
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+            <h1 style={{ ...serif, fontSize: 28, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em" }}>Civic One</h1>
+            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label="Language">
+              {LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
+                  style={{
+                    ...sans,
+                    fontSize: 12.5,
+                    padding: "0 0 2px",
+                    color: lang === l.code ? C.ink : C.muted,
+                    fontWeight: lang === l.code ? 600 : 400,
+                    borderBottom: lang === l.code ? `1.5px solid ${C.gold}` : "1.5px solid transparent",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </nav>
+          </div>
+          <div style={{ height: 1, background: C.hairline, marginTop: 16 }} />
+        </header>
+
+        <main>
+          <section style={{ padding: "40px 0 8px" }}>
+            <Link
+              to={"/district/" + d}
+              style={{ ...sans, fontSize: 12.5, color: C.muted, textDecoration: "none" }}
+            >
+              {rtl ? "→" : "←"} {t.r311Back}
+            </Link>
+            <h2 style={{ ...serif, fontSize: 36, fontWeight: 400, color: C.ink, lineHeight: 1.1, marginTop: 22 }}>
+              {t.r311Label}
+            </h2>
+            <p style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.muted, marginTop: 14, lineHeight: 1.55, maxWidth: 520 }}>
+              {t.r311What}
+            </p>
+          </section>
+          <ReportForm t={t} />
+        </main>
+
+        <footer style={{ paddingTop: 32, textAlign: "center" }}>
+          <p style={{ ...sans, fontSize: 11, color: C.muted }}>{t.privacy}</p>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+function Report311Route({ lang, setLang }) {
+  const { id } = useParams();
+  const district = getDistrict(id);
+  if (!district) return <Navigate to="/" replace />;
+  return <Report311Page key={district.id} district={district} lang={lang} setLang={setLang} />;
+}
+
 /* ---------- Route wrapper: reads :id, guards invalid ---------- */
 function DistrictRoute({ lang, setLang }) {
   const { id } = useParams();
@@ -451,6 +549,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<DistrictView key="home" district={home} lang={lang} setLang={setLang} />} />
         <Route path="/district/:id" element={<DistrictRoute lang={lang} setLang={setLang} />} />
+        <Route path="/district/:id/report" element={<Report311Route lang={lang} setLang={setLang} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

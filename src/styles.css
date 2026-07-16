@@ -26,3 +26,12 @@ button {
 a {
   color: inherit;
 }
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #a9863a;
+  outline-offset: 2px;
+}
