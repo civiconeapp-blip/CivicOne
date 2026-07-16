@@ -68,7 +68,8 @@ function Step({ n, title, desc }) {
 function ProgramGuideView({ program }) {
   const [loaded, setLoaded] = useState(false);
   useEffect(() => setLoaded(true), []);
-
+  useEffect(() => { window.scrollTo(0, 0); }, []);
+  
   const fade = (delay) => ({
     opacity: loaded ? 1 : 0,
     transform: loaded ? "translateY(0)" : "translateY(10px)",
