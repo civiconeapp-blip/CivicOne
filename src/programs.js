@@ -54,8 +54,8 @@ export const PROGRAMS = [
     ],
     officialHref: "https://www.getcalfresh.org",
     officialLabel: "Start your application at GetCalFresh.org",
-    phoneLabel: "County CalFresh line",
-    phone: "1-415-558-1001",
+    phoneLabel: "SFHSA CalFresh service line",
+    phone: "1-855-355-5757", // verified sfhsa.org 2026-07-15
   },
   {
     slug: "housing",
@@ -96,8 +96,8 @@ export const PROGRAMS = [
     ],
     officialHref: "https://housing.sfgov.org",
     officialLabel: "Browse listings & apply at housing.sfgov.org",
-    phoneLabel: "SF Rent Board",
-    phone: "1-415-252-4602",
+    phoneLabel: "SF Rent Board counseling",
+    phone: "1-415-252-4600", // verified sf.gov 2026-07-15
   },
   {
     slug: "health",
