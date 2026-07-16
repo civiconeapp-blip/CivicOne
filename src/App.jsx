@@ -357,6 +357,19 @@ function DistrictView({ district, lang, setLang }) {
           )}
         </section>
 
+         <section style={{ paddingBottom: 64, ...fade(0.32) }}>
+          <SectionLabel>Application Guides</SectionLabel>
+          <p style={{ ...sans, fontSize: 12.5, color: C.muted, margin: "-16px 0 20px" }}>
+            Step-by-step help applying for common programs. You'll finish and submit on each
+            program's official site.
+          </p>
+          <div style={{ borderTop: `1px solid ${C.hairline}` }}>
+            {PROGRAMS.map((p) => (
+              <GuideRow key={p.slug} title={p.navLabel} desc={p.navDesc} rtl={rtl} to={"/apply/" + p.slug} />
+            ))}
+          </div>
+        </section>       
+
  <section style={{ paddingBottom: 64, ...fade(0.4) }}>
           <SectionLabel>{t.ledgerLabel}</SectionLabel>
           <p style={{ ...sans, fontSize: 11.5, color: C.muted, margin: "-16px 0 20px" }}>
@@ -570,6 +583,7 @@ export default function App() {
         <Route path="/" element={<DistrictView key="home" district={home} lang={lang} setLang={setLang} />} />
         <Route path="/district/:id" element={<DistrictRoute lang={lang} setLang={setLang} />} />
         <Route path="/district/:id/report" element={<Report311Route lang={lang} setLang={setLang} />} />
+        <Route path="/apply/:slug" element={<ProgramGuideRoute />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
