@@ -16,6 +16,17 @@
 
 export const SFBOS_ROOT = "https://sfbos.org";
 
+/**
+ * Districts currently visible in the app. All 11 remain in DISTRICTS
+ * below (data verified, links tap-checked) — re-activating one is a
+ * one-number edit here, no re-verification needed.
+ */
+export const ACTIVE_DISTRICTS = [5, 6, 9];
+
+export function isActive(id) {
+  return ACTIVE_DISTRICTS.includes(Number(id));
+}
+
 export const DISTRICTS = [
   { id: 1,  supervisor: "Connie Chan",       page: "https://sfbos.org/supervisor-chan-district-1", neighborhoods: null },
   { id: 2,  supervisor: "Stephen Sherrill",  page: "https://sfbos.org/supervisor-sherrill-district-2", neighborhoods: null },

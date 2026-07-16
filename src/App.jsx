@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Link, useParams, Navigate } from "react-router-dom";
 import { LANGS, T } from "./i18n.js";
 import ReportForm from "./ReportForm.jsx";
-import { DISTRICTS, getDistrict } from "./districts.js";
+import { DISTRICTS, getDistrict, isActive } from "./districts.js";
 
 
 /* ---------- Design tokens: "City Briefing" system ---------- */
@@ -424,7 +424,7 @@ function DistrictView({ district, lang, setLang }) {
           <SectionLabel>{t.pickerLabel}</SectionLabel>
           <p style={{ ...sans, fontSize: 12.5, color: C.muted, margin: "-16px 0 20px" }}>{t.pickerHint}</p>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
-            {DISTRICTS.map((dd) => (
+            {DISTRICTS.filter((dd) => isActive(dd.id)).map((dd) => (
               <Link
                 key={dd.id}
                 to={"/district/" + dd.id}
@@ -528,7 +528,7 @@ function Report311Page({ district, lang, setLang }) {
 function Report311Route({ lang, setLang }) {
   const { id } = useParams();
   const district = getDistrict(id);
-  if (!district) return <Navigate to="/" replace />;
+  if (!district || !isActive(district.id)) return <Navigate to="/" replace />;
   return <Report311Page key={district.id} district={district} lang={lang} setLang={setLang} />;
 }
 
@@ -536,7 +536,7 @@ function Report311Route({ lang, setLang }) {
 function DistrictRoute({ lang, setLang }) {
   const { id } = useParams();
   const district = getDistrict(id);
-  if (!district) return <Navigate to="/" replace />;
+  if (!district || !isActive(district.id)) return <Navigate to="/" replace />;
   return <DistrictView key={district.id} district={district} lang={lang} setLang={setLang} />;
 }
 
