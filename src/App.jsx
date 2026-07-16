@@ -105,14 +105,16 @@ function SectionLabel({ children }) {
     </div>
   );
 }
-function ServiceRow({ title, desc, rtl, href }) {
+function ServiceRow({ title, desc, rtl, href, to }) {
   const [hover, setHover] = useState(false);
+  const Tag = to ? Link : "a";
+  const linkProps = to
+    ? { to }
+    : { href, target: "_blank", rel: "noopener noreferrer" };
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-            onClick={() => { if (window.umami) window.umami.track("service_tap", { service: href }); }}
+    <Tag
+      {...linkProps}
+      onClick={() => { if (window.umami) window.umami.track("service_tap", { service: to || href }); }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       style={{
@@ -145,7 +147,7 @@ function ServiceRow({ title, desc, rtl, href }) {
       <span style={{ ...serif, color: hover ? C.gold : C.muted, fontSize: 20, transition: "color 0.2s" }}>
         {rtl ? "←" : "→"}
       </span>
-    </a>
+    </Tag>
   );
 }
 
@@ -362,7 +364,7 @@ function DistrictView({ district, lang, setLang }) {
         <section style={{ paddingBottom: 64, ...fade(0.3) }}>
           <SectionLabel>{t.servicesLabel}</SectionLabel>
           <div style={{ borderTop: `1px solid ${C.hairline}` }}>
-            <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} href={LINKS.s1} />
+            <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} to={"/district/" + d + "/report"} />
             <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} href={LINKS.s2} />
             <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} href={LINKS.s3} />
             <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} href={LINKS.s4} />
