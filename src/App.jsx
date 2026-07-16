@@ -334,32 +334,6 @@ function DistrictView({ district, lang, setLang }) {
           <BayBridge />
         </section>
 
-        <section style={{ paddingBottom: 56, ...fade(0.22) }} aria-label={t.r311Label}>
-          <div style={{ background: C.navy, padding: "26px 26px 28px" }}>
-            <div style={{ ...caps, fontSize: 10.5, color: C.goldLine }}>{t.r311Label}</div>
-            <p style={{ ...serif, fontSize: 17, fontStyle: "italic", color: "rgba(245,242,234,0.75)", margin: "10px 0 18px", lineHeight: 1.5 }}>
-              {t.r311Sub}
-            </p>
-            <Link
-              to={"/district/" + d + "/report"}
-              aria-label={t.reportLabel}
-              onClick={() => { if (window.umami) window.umami.track("report_cta", { district: d }); }}
-              style={{
-                ...caps,
-                display: "inline-block",
-                fontSize: 12,
-                background: C.gold,
-                color: C.navy,
-                padding: "15px 26px",
-                minHeight: 44,
-                boxSizing: "border-box",
-                textDecoration: "none",
-              }}
-            >
-              {t.reportLabel} {rtl ? "←" : "→"}
-            </Link>
-          </div>
-        </section>
 
         <section style={{ paddingBottom: 64, ...fade(0.3) }}>
           <SectionLabel>{t.servicesLabel}</SectionLabel>
