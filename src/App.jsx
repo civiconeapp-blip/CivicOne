@@ -58,7 +58,7 @@ const LINKS = {
 };
 
 /* ---------- Bay Bridge etching ---------- */
-function BayBridge() {
+function BayBridge({ caption }) {
   return (
     <div aria-hidden="true" style={{ margin: "40px 0 0" }}>
       <svg viewBox="0 0 800 110" style={{ width: "100%", display: "block" }}>
@@ -89,7 +89,7 @@ function BayBridge() {
         </g>
       </svg>
       <div style={{ ...caps, fontSize: 9, color: C.muted, textAlign: "center", marginTop: 10, letterSpacing: "0.22em" }}>
-        San Francisco – Oakland Bay Bridge
+        {caption}
       </div>
     </div>
   );
@@ -181,7 +181,7 @@ function DistrictView({ district, lang, setLang }) {
         setRequests(
           rows.map((r) => ({
             id: r.service_request_id || "—",
-            name: r.service_name || r.service_subtype || "311 request",
+            name: r.service_name || r.service_subtype || t.requestFallback,
             loc: r.address || r.neighborhoods_sffind_boundaries || t.districtFmt.replace("{n}", d),
             status: statusKey(r.status_description),
             date: r.requested_datetime ? r.requested_datetime.slice(0, 10) : "",
@@ -200,7 +200,7 @@ function DistrictView({ district, lang, setLang }) {
     return () => {
       cancelled = true;
     };
-  }, [d]);
+  }, [d, lang]);
 
   useEffect(() => {
     let cancelled = false;
@@ -290,7 +290,7 @@ function DistrictView({ district, lang, setLang }) {
           <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, marginTop: 16, lineHeight: 1.55, maxWidth: 460 }}>
             {featured ? t.intro : t.introGeneric}
           </p>
-          <BayBridge />
+          <BayBridge caption={t.bridgeCaption} />
         </section>
 
 
@@ -455,7 +455,7 @@ function Report311Page({ district, lang, setLang }) {
           <div style={{ height: 1, background: C.ink, margin: "16px 0" }} />
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <h1 style={{ ...serif, fontSize: 28, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em" }}>Civic One</h1>
-            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label="Language">
+            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label={t.langNav}>
               {LANGS.map((l) => (
                 <button
                   key={l.code}
@@ -529,7 +529,7 @@ export default function App() {
         <Route path="/" element={<DistrictView key="home" district={home} lang={lang} setLang={setLang} />} />
         <Route path="/district/:id" element={<DistrictRoute lang={lang} setLang={setLang} />} />
         <Route path="/district/:id/report" element={<Report311Route lang={lang} setLang={setLang} />} />
-        <Route path="/apply/:slug" element={<ProgramGuideRoute />} />
+        <Route path="/apply/:slug" element={<ProgramGuideRoute lang={lang} setLang={setLang} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
