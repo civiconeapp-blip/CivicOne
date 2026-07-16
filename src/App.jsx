@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Link, useParams, Navigate } from "react-r
 import { LANGS, T } from "./i18n.js";
 import ReportForm from "./ReportForm.jsx";
 import { DISTRICTS, getDistrict, isActive } from "./districts.js";
+import { PROGRAMS } from "./programs.js";
+import ProgramGuideRoute from "./ProgramGuide.jsx";
+
 
 
 /* ---------- Design tokens: "City Briefing" system ---------- */
