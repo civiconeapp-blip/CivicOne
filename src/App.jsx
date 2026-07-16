@@ -340,8 +340,8 @@ function DistrictView({ district, lang, setLang }) {
           <div style={{ borderTop: `1px solid ${C.hairline}` }}>
             <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} to={"/district/" + d + "/report"} />
             <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} href={LINKS.s2} />
-            <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} href={LINKS.s3} />
-            <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} href={LINKS.s4} />
+            <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} to="/apply/food" />
+            <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} to="/apply/housing" />
             {featured && (
               <>
                 <ServiceRow title={t.s5} desc={t.s5d} rtl={rtl} href={LINKS.s5} />
