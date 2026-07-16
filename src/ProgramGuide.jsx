@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
-import { getProgram, PROGRAMS } from "./programs.js";
+import { getProgram, getPrograms } from "./programs.js";
+import { T, LANGS } from "./i18n.js";
 
 /* Local design tokens (matches App.jsx "City Briefing" system) */
 const C = {
@@ -65,7 +66,9 @@ function Step({ n, title, desc }) {
 }
 
 /* ---------- The full guide page for one program ---------- */
-function ProgramGuideView({ program }) {
+function ProgramGuideView({ program, lang, setLang }) {
+  const t = T[lang];
+  const rtl = lang === "ar";
   const [loaded, setLoaded] = useState(false);
   useEffect(() => setLoaded(true), []);
   useEffect(() => { window.scrollTo(0, 0); }, []);
@@ -77,7 +80,7 @@ function ProgramGuideView({ program }) {
   });
 
   return (
-    <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
+    <div dir={rtl ? "rtl" : "ltr"} style={{ background: C.paper, minHeight: "100vh", ...sans }}>
       <div style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 80px" }}>
         <header style={{ paddingTop: 48, ...fade(0) }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
@@ -85,11 +88,30 @@ function ProgramGuideView({ program }) {
               to="/"
               style={{ ...caps, fontSize: 10.5, color: C.muted, textDecoration: "none" }}
             >
-              ← Civic One
+              {rtl ? "→" : "←"} Civic One
             </Link>
-            <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>Application Guide</span>
+            <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>{t.guideTag}</span>
           </div>
           <div style={{ height: 1, background: C.ink, margin: "16px 0" }} />
+          <nav style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
+            {LANGS.map((l) => (
+              <button
+                key={l.code}
+                onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
+                style={{
+                  ...sans,
+                  fontSize: 12.5,
+                  padding: "0 0 2px",
+                  color: lang === l.code ? C.ink : C.muted,
+                  fontWeight: lang === l.code ? 600 : 400,
+                  borderBottom: lang === l.code ? `1.5px solid ${C.gold}` : "1.5px solid transparent",
+                  transition: "all 0.2s",
+                }}
+              >
+                {l.label}
+              </button>
+            ))}
+          </nav>
           <h1 style={{ ...serif, fontSize: 34, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em" }}>
             {program.title}
           </h1>
@@ -105,7 +127,7 @@ function ProgramGuideView({ program }) {
         <section style={{ padding: "32px 0", ...fade(0.18) }}>
           <div style={{ background: C.cream, border: `1px solid ${C.hairline}`, padding: "20px 24px" }}>
             <div style={{ ...caps, fontSize: 10.5, color: C.gold, marginBottom: 8 }}>
-              Before You Start
+              {t.guideBefore}
             </div>
             <p style={{ ...sans, fontSize: 13.5, color: C.ink, lineHeight: 1.6 }}>
               {program.eligibilityNote}
@@ -114,7 +136,7 @@ function ProgramGuideView({ program }) {
         </section>
 
         <section style={{ paddingBottom: 48, ...fade(0.26) }}>
-          <SectionLabel>What You'll Need</SectionLabel>
+          <SectionLabel>{t.guideNeed}</SectionLabel>
           <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
             {program.documents.map((doc, i) => (
               <li
@@ -137,7 +159,7 @@ function ProgramGuideView({ program }) {
         </section>
 
         <section style={{ paddingBottom: 48, ...fade(0.34) }}>
-          <SectionLabel>Step by Step</SectionLabel>
+          <SectionLabel>{t.guideSteps}</SectionLabel>
           <div style={{ borderTop: `1px solid ${C.hairline}` }}>
             {program.steps.map((s, i) => (
               <Step key={i} n={i + 1} title={s.title} desc={s.desc} />
@@ -148,10 +170,9 @@ function ProgramGuideView({ program }) {
         <section style={fade(0.42)}>
           <div style={{ background: C.navy, padding: "36px 32px", position: "relative" }}>
             <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 3, background: C.gold }} />
-            <span style={{ ...caps, fontSize: 10.5, color: C.goldLine }}>Ready to Apply</span>
+            <span style={{ ...caps, fontSize: 10.5, color: C.goldLine }}>{t.guideReady}</span>
             <p style={{ ...sans, fontSize: 13, color: "rgba(245,242,234,0.75)", marginTop: 12, lineHeight: 1.6 }}>
-              You'll finish and submit your application on the official site — Civic One doesn't
-              collect or store your information.
+              {t.guideReadyNote}
             </p>
             <a
               href={program.officialHref}
@@ -169,7 +190,7 @@ function ProgramGuideView({ program }) {
                 textDecoration: "none",
               }}
             >
-              {program.officialLabel} →
+              {program.officialLabel} {rtl ? "←" : "→"}
             </a>
             {program.phone && (
               <div style={{ ...mono, fontSize: 12, color: "rgba(245,242,234,0.65)", marginTop: 20 }}>
@@ -180,9 +201,9 @@ function ProgramGuideView({ program }) {
         </section>
 
         <section style={{ paddingTop: 48, ...fade(0.5) }}>
-          <SectionLabel>Other Guides</SectionLabel>
+          <SectionLabel>{t.guideOther}</SectionLabel>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
-            {PROGRAMS.filter((p) => p.slug !== program.slug).map((p) => (
+            {getPrograms(lang).filter((p) => p.slug !== program.slug).map((p) => (
               <Link
                 key={p.slug}
                 to={"/apply/" + p.slug}
@@ -205,7 +226,7 @@ function ProgramGuideView({ program }) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16 }}>
             <div style={{ height: 1, width: 40, background: C.goldLine }} />
             <span style={{ ...caps, fontSize: 9.5, color: C.muted }}>
-              Civic One — built for the residents of San Francisco
+              {t.footer}
             </span>
             <div style={{ height: 1, width: 40, background: C.goldLine }} />
           </div>
@@ -216,9 +237,9 @@ function ProgramGuideView({ program }) {
 }
 
 /* ---------- Route wrapper: reads :slug, guards invalid ---------- */
-export default function ProgramGuideRoute() {
+export default function ProgramGuideRoute({ lang, setLang }) {
   const { slug } = useParams();
-  const program = getProgram(slug);
+  const program = getProgram(slug, lang);
   if (!program) return <Navigate to="/" replace />;
-  return <ProgramGuideView key={program.slug} program={program} />;
+  return <ProgramGuideView key={program.slug} program={program} lang={lang} setLang={setLang} />;
 }
