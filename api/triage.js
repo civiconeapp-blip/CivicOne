@@ -120,12 +120,21 @@ export default async function handler(req, res) {
       .filter((p) => p.text && !p.thought)
       .map((p) => p.text)
       .join("");
-    let out;
-    try {
-      const start = raw.indexOf("{");
-      const end = raw.lastIndexOf("}");
-      out = JSON.parse(raw.slice(start, end + 1));
-    } catch {
+
+    // Extract the JSON object: try the last closing brace, and if the slice
+    // doesn't parse (stray extra braces, trailing junk), walk backward to the
+    // previous closing brace until something valid is found.
+    let out = null;
+    const start = raw.indexOf("{");
+    let end = raw.lastIndexOf("}");
+    while (start >= 0 && end > start && !out) {
+      try {
+        out = JSON.parse(raw.slice(start, end + 1));
+      } catch {
+        end = raw.lastIndexOf("}", end - 1);
+      }
+    }
+    if (!out) {
       console.error(
         "Unparseable triage output. finishReason:",
         cand?.finishReason,
