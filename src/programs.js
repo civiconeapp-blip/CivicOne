@@ -102,7 +102,7 @@ export const PROGRAMS = [
   {
     slug: "health",
     navLabel: "Health Coverage",
-    navDesc: "Medi-Cal, Healthy SF, and free or low-cost clinics",
+    navDesc: "Medi-Cal, Healthy SF, and Covered California",
     title: "Applying for Health Coverage",
     intro:
       "Most San Francisco residents can get free or low-cost health coverage through Medi-Cal or Healthy SF, regardless of immigration status. Coverage includes doctor visits, urgent care, and prescriptions.",
@@ -118,6 +118,10 @@ export const PROGRAMS = [
       {
         title: "Check your options",
         desc: "You don't need to know in advance whether you qualify for Medi-Cal or Healthy SF — one application checks both.",
+      },
+      {
+        title: "If your income is above Medi-Cal limits",
+        desc: "Covered California is the state's official marketplace for subsidized private health plans — most applicants qualify for financial help. Free enrollment assistance: (800) 300-1506.",
       },
       {
         title: "Gather what you have",
@@ -216,6 +220,7 @@ export const PROGRAM_T = {
       ],
       steps: [
         { title: "Revise sus opciones", desc: "No necesita saber de antemano si califica para Medi-Cal o Healthy SF — una sola solicitud revisa ambos." },
+        { title: "Si sus ingresos superan los límites de Medi-Cal", desc: "Covered California es el mercado oficial del estado de planes de salud privados con subsidio — la mayoría de los solicitantes califica para ayuda financiera. Asistencia de inscripción gratuita: (800) 300-1506." },
         { title: "Reúna lo que tenga", desc: "Traiga identificación y comprobante de domicilio. Los documentos de ingresos ayudan pero no son necesarios para comenzar — puede solicitar con un ingreso autodeclarado y complementar después." },
         { title: "Solicite en línea o en persona", desc: "Solicite a través de BenefitsCal, o visite una oficina de la Agencia de Servicios Humanos si desea ayuda en persona para completar el formulario." },
         { title: "Reciba su confirmación", desc: "Recibirá un aviso por correo confirmando su inscripción y, en el caso de Medi-Cal, la asignación de su plan de salud." },
@@ -290,6 +295,7 @@ export const PROGRAM_T = {
       ],
       steps: [
         { title: "瞭解您的選擇", desc: "您無需事先知道自己符合 Medi-Cal 還是 Healthy SF 的資格——一份申請會同時審核兩者。" },
+        { title: "如果您的收入超過 Medi-Cal 上限", desc: "Covered California 是加州官方的保險市場，提供有補貼的私人健康保險計劃——大多數申請人可獲得財務補助。免費登記協助：(800) 300-1506。" },
         { title: "準備現有資料", desc: "帶上身份證件和地址證明。收入文件有幫助但並非開始申請的必要條件——您可以先自行申報收入,之後再補交。" },
         { title: "線上或親自申請", desc: "透過 BenefitsCal 線上申請,或前往人類服務局辦公室獲得現場協助填寫表格。" },
         { title: "獲取確認通知", desc: "您將收到郵寄的通知,確認您已加入;如為 Medi-Cal,還會告知您的健康計劃分配。" },
@@ -364,6 +370,7 @@ export const PROGRAM_T = {
       ],
       steps: [
         { title: "Xem các lựa chọn của bạn", desc: "Bạn không cần biết trước mình đủ điều kiện Medi-Cal hay Healthy SF — một đơn sẽ kiểm tra cả hai." },
+        { title: "Nếu thu nhập của bạn vượt giới hạn Medi-Cal", desc: "Covered California là thị trường chính thức của tiểu bang cho các gói bảo hiểm y tế tư nhân được trợ cấp — hầu hết người nộp đơn đủ điều kiện nhận hỗ trợ tài chính. Trợ giúp ghi danh miễn phí: (800) 300-1506." },
         { title: "Chuẩn bị những gì bạn có", desc: "Mang theo giấy tờ tùy thân và bằng chứng địa chỉ. Giấy tờ thu nhập hữu ích nhưng không bắt buộc để bắt đầu — bạn có thể tự khai thu nhập và bổ sung sau." },
         { title: "Nộp đơn trực tuyến hoặc trực tiếp", desc: "Nộp đơn qua BenefitsCal, hoặc đến văn phòng Cơ quan Dịch vụ Nhân sinh nếu bạn muốn được trợ giúp trực tiếp khi điền đơn." },
         { title: "Nhận xác nhận", desc: "Bạn sẽ nhận thông báo qua bưu điện xác nhận việc ghi danh và, với Medi-Cal, chương trình bảo hiểm được chỉ định." },
@@ -438,6 +445,7 @@ export const PROGRAM_T = {
       ],
       steps: [
         { title: "تعرّف على خياراتك", desc: "لست بحاجة لمعرفة مسبقة بأهليتك لـ Medi-Cal أو Healthy SF — طلب واحد يفحص كليهما." },
+        { title: "إذا كان دخلك أعلى من حدود Medi-Cal", desc: "‏Covered California هو سوق الولاية الرسمي للخطط الصحية الخاصة المدعومة — معظم المتقدمين مؤهلون للمساعدة المالية. مساعدة مجانية في التسجيل: (800) 300-1506." },
         { title: "اجمع ما لديك", desc: "أحضر الهوية وإثبات العنوان. مستندات الدخل مفيدة لكنها غير مطلوبة للبدء — يمكنك التقديم بدخل مُصرّح به ذاتيًا واستكمال المستندات لاحقًا." },
         { title: "قدّم عبر الإنترنت أو شخصيًا", desc: "قدّم عبر BenefitsCal، أو قم بزيارة مكتب وكالة الخدمات الإنسانية إذا أردت مساعدة شخصية في إكمال النموذج." },
         { title: "استلم تأكيدك", desc: "ستتلقى إشعارًا بالبريد يؤكد التسجيل، وفي حالة Medi-Cal، تعيين خطتك الصحية." },

@@ -301,6 +301,7 @@ function DistrictView({ district, lang, setLang }) {
             <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} href={LINKS.s2} />
             <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} to="/apply/food" />
             <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} to="/apply/housing" />
+            <ServiceRow title={t.sHealth} desc={t.sHealthd} rtl={rtl} to="/apply/health" />
             {featured && (
               <>
                 <ServiceRow title={t.s5} desc={t.s5d} rtl={rtl} href={LINKS.s5} />
