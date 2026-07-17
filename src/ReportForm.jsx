@@ -274,7 +274,7 @@ export default function ReportForm({ t }) {
             >
               {copied ? t.rCopied : t.rCopy}
             </button>
-            
+            <a
               href="https://www.sf311.org"
               onClick={() => {
                 if (window.umami) window.umami.track("report_finished", { category: cat });
