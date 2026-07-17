@@ -2,7 +2,7 @@
 // Vercel serverless function. Needs GEMINI_API_KEY set in Vercel env vars.
 // Privacy: nothing is stored. Report text goes to the AI, comes back, and is gone.
 
-const MODEL = "gemini-2.5-flash";
+const MODEL = "gemini-3.5-flash";
 
 // Draft list — to be confirmed against SF311's official Open311 services list.
 const CATEGORIES = [
