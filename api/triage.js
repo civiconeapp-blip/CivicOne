@@ -45,7 +45,8 @@ A resident describes a neighborhood problem in their own language. Your job:
    polite question in the resident's language in "followup_question" asking
    them to describe what they see and where. Leave description_en brief.
 
-Respond with ONLY a JSON object with exactly these keys:
+Keep every field concise. Respond with ONLY a compact JSON object (no line
+breaks needed) with exactly these keys:
 emergency (boolean), category (string), severity (number), severity_reason
 (string), title (string), description_en (string), summary_local (string),
 needs_more_info (boolean), followup_question (string or null).`;
@@ -94,7 +95,11 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
           contents: [{ role: "user", parts: [{ text: userText }] }],
-          generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.2,
+            maxOutputTokens: 4096,
+          },
         }),
       }
     );
@@ -108,15 +113,25 @@ export default async function handler(req, res) {
     }
 
     const data = await r.json();
-    const parts = data?.candidates?.[0]?.content?.parts || [];
-    const raw = parts.map((p) => p.text || "").join("");
+    const cand = data?.candidates?.[0];
+    const parts = cand?.content?.parts || [];
+    // Ignore the model's internal "thinking" parts; read only real answer text.
+    const raw = parts
+      .filter((p) => p.text && !p.thought)
+      .map((p) => p.text)
+      .join("");
     let out;
     try {
       const start = raw.indexOf("{");
       const end = raw.lastIndexOf("}");
       out = JSON.parse(raw.slice(start, end + 1));
     } catch {
-      console.error("Unparseable triage output:", String(raw).slice(0, 500));
+      console.error(
+        "Unparseable triage output. finishReason:",
+        cand?.finishReason,
+        "raw:",
+        String(raw).slice(0, 800)
+      );
       return res
         .status(502)
         .json({ error: "Triage gave an unreadable answer. Please try again." });
