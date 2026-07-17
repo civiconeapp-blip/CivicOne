@@ -203,7 +203,7 @@ export default function ReportForm({ t }) {
           <p dir="auto" style={{ ...sans, fontSize: 16, fontWeight: 600, color: C.alert, margin: 0, lineHeight: 1.5 }}>
             {ai.summary_local}
           </p>
-          
+          <a
             href="tel:911"
             style={{
               ...caps,
