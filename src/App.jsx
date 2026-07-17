@@ -4,6 +4,8 @@ import { LANGS, T } from "./i18n.js";
 import ReportForm from "./ReportForm.jsx";
 import { DISTRICTS, getDistrict, isActive } from "./districts.js";
 import ProgramGuideRoute from "./ProgramGuide.jsx";
+import EventsCalendar from "./EventsCalendar.jsx";
+import { upcomingEvents } from "./events.js";
 
 
 
@@ -400,6 +402,32 @@ function DistrictView({ district, lang, setLang }) {
           </div>
         </section>
 
+        {upcomingEvents(d).length > 0 && (
+          <section style={{ paddingBottom: 56, ...fade(0.5) }}>
+            <SectionLabel>{t.evLabel}</SectionLabel>
+            <div style={{ borderTop: `1px solid ${C.hairline}` }}>
+              {upcomingEvents(d).slice(0, 3).map((e) => (
+                <a
+                  key={e.id}
+                  href={e.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => { if (window.umami) window.umami.track("event_tap", { event: e.id, district: d }); }}
+                  style={{ display: "block", textDecoration: "none", padding: "16px 0", borderBottom: `1px solid ${C.hairline}` }}
+                >
+                  <div style={{ ...serif, fontSize: 17, color: C.ink }}>{e.title}</div>
+                  <div style={{ ...sans, fontSize: 12.5, color: C.muted, marginTop: 5 }}>
+                    {new Date(e.date + "T00:00:00").toLocaleDateString(lang === "en" ? "en-US" : lang === "zh" ? "zh-CN" : lang, { weekday: "short", month: "short", day: "numeric" })} · {e.time} · {e.venue}
+                  </div>
+                </a>
+              ))}
+            </div>
+            <Link to={"/events?d=" + d} style={{ ...sans, fontSize: 12.5, color: C.gold, display: "inline-block", marginTop: 16, textDecoration: "none" }}>
+              {t.evView} {rtl ? "←" : "→"}
+            </Link>
+          </section>
+        )}
+
         <section style={{ paddingTop: 56, ...fade(0.65) }}>
           <SectionLabel>{t.pickerLabel}</SectionLabel>
           <p style={{ ...sans, fontSize: 12.5, color: C.muted, margin: "-16px 0 20px" }}>{t.pickerHint}</p>
@@ -424,6 +452,9 @@ function DistrictView({ district, lang, setLang }) {
               </Link>
             ))}
           </div>
+          <Link to="/events" style={{ ...sans, fontSize: 12.5, color: C.gold, display: "inline-block", marginTop: 18, textDecoration: "none" }}>
+            {t.evView} {rtl ? "←" : "→"}
+          </Link>
         </section>
 
         <footer style={{ paddingTop: 48, textAlign: "center", ...fade(0.7) }}>
@@ -531,6 +562,7 @@ export default function App() {
         <Route path="/district/:id" element={<DistrictRoute lang={lang} setLang={setLang} />} />
         <Route path="/district/:id/report" element={<Report311Route lang={lang} setLang={setLang} />} />
         <Route path="/apply/:slug" element={<ProgramGuideRoute lang={lang} setLang={setLang} />} />
+        <Route path="/events" element={<EventsCalendar lang={lang} setLang={setLang} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
