@@ -48,17 +48,22 @@ emergency (boolean), category (string), severity (number), severity_reason
 needs_more_info (boolean), followup_question (string or null).`;
 
 export default async function handler(req, res) {
-  // Health check: visit this URL in a browser to confirm deploy + key.
-  if (req.method === "GET") {
+ // Health check: visit this URL in a browser to confirm deploy + key.
+  // Add ?q=describe a problem to run a live triage test from the browser.
+  if (req.method === "GET" && !(req.query && req.query.q)) {
     return res
       .status(200)
       .json({ ok: true, hasKey: Boolean(process.env.GEMINI_API_KEY) });
   }
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "POST only" });
+  if (req.method !== "GET" && req.method !== "POST") {
+    return res.status(405).json({ error: "GET or POST only" });
   }
 
-  const { description, location } = req.body || {};
+  const body =
+    req.method === "GET"
+      ? { description: req.query.q, location: req.query.loc }
+      : req.body || {};
+  const { description, location } = body;
   if (typeof description !== "string" || description.trim().length < 3) {
     return res.status(400).json({ error: "Please describe the problem." });
   }
