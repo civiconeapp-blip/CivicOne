@@ -4,19 +4,15 @@
 
 const MODEL = "gemini-3.5-flash";
 
-// Draft list — to be confirmed against SF311's official Open311 services list.
+// Draft list — matches the site's form; to be confirmed against SF311's official list.
 const CATEGORIES = [
-  "Street or sidewalk cleaning",
+  "Street or Sidewalk Cleaning",
   "Graffiti",
+  "Pothole & Street Issues",
+  "Streetlight Repair",
+  "Abandoned Vehicle",
   "Encampment",
-  "Streetlight repair",
-  "Pothole or street defect",
-  "Abandoned vehicle",
-  "Tree maintenance",
-  "Illegal dumping",
-  "Noise",
-  "Blocked driveway",
-  "Other",
+  "General Request",
 ];
 
 const SYSTEM_PROMPT = `You are the intake triage system for CivicOne, a civic
