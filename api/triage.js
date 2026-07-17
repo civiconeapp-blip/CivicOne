@@ -25,7 +25,7 @@ A resident describes a neighborhood problem in their own language. Your job:
    to true and put a short message in the resident's own language telling them
    to call 911 immediately in "summary_local". Do nothing else.
 2. Pick "category" ONLY from this exact list: ${CATEGORIES.join("; ")}.
-   If nothing fits, use "Other". Never invent a category.
+   If nothing fits, use "General Request". Never invent a category.
 3. Rate "severity" 1 (minor), 2 (moderate), or 3 (safety hazard), with a
    one-line "severity_reason" in English.
 4. Write "title" (under 10 words, English) and "description_en": a clear,
@@ -44,75 +44,6 @@ emergency (boolean), category (string), severity (number), severity_reason
 needs_more_info (boolean), followup_question (string or null).`;
 
 export default async function handler(req, res) {
- // Health check: visit this URL in a browser to confirm deploy + key.
+  // Health check: visit this URL in a browser to confirm deploy + key.
   // Add ?q=describe a problem to run a live triage test from the browser.
-  if (req.method === "GET" && !(req.query && req.query.q)) {
-    return res
-      .status(200)
-      .json({ ok: true, hasKey: Boolean(process.env.GEMINI_API_KEY) });
-  }
-  if (req.method !== "GET" && req.method !== "POST") {
-    return res.status(405).json({ error: "GET or POST only" });
-  }
-
-  const body =
-    req.method === "GET"
-      ? { description: req.query.q, location: req.query.loc }
-      : req.body || {};
-  const { description, location } = body;
-  if (typeof description !== "string" || description.trim().length < 3) {
-    return res.status(400).json({ error: "Please describe the problem." });
-  }
-  if (description.length > 1500 || (location && String(location).length > 300)) {
-    return res.status(400).json({ error: "Description is too long." });
-  }
-  if (!process.env.GEMINI_API_KEY) {
-    return res.status(500).json({ error: "Server is not configured yet." });
-  }
-
-  const userText =
-    "Resident's report:\n" +
-    description.trim() +
-    (location ? "\n\nLocation the resident gave: " + String(location).trim() : "\n\n(No location given.)");
-
-  try {
-    const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents: [{ role: "user", parts: [{ text: userText }] }],
-          generationConfig: { responseMimeType: "application/json", temperature: 0.2 },
-        }),
-      }
-    );
-
-    if (!r.ok) {
-      const detail = await r.text();
-      console.error("Gemini error", r.status, detail.slice(0, 500));
-      return res.status(502).json({ error: "Triage is temporarily unavailable. Please try again." });
-    }
-
-    const data = await r.json();
-    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    let out;
-    try {
-      out = JSON.parse(raw);
-    } catch {
-      return res.status(502).json({ error: "Triage gave an unreadable answer. Please try again." });
-    }
-
-    // Server-side guardrails: never trust the model blindly.
-    if (!CATEGORIES.includes(out.category)) out.category = "Other";
-    out.severity = Math.min(3, Math.max(1, Number(out.severity) || 1));
-    out.emergency = Boolean(out.emergency);
-    out.needs_more_info = Boolean(out.needs_more_info);
-
-    return res.status(200).json(out);
-  } catch (err) {
-    console.error("Triage failure", err);
-    return res.status(500).json({ error: "Something went wrong. Please try again." });
-  }
-}
+  
