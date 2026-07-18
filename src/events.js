@@ -102,6 +102,26 @@ export const EVENTS = [
     url: "https://sfpl.org/events/2026/09/12/film-chinatown-1995",
     verified: "2026-07-17 Amal",
   },
+  {
+    id: "painting-big-feelings-2026-07-25",
+    district: 9,
+    title: "Workshop: Painting Big Feelings",
+    venue: "Bernal Heights Branch Library, 500 Cortland Ave",
+    date: "2026-07-25",
+    time: "3:30 – 5:00 PM",
+    url: "https://sfpl.org/events/2026/07/25/workshop-painting-big-feelings",
+    verified: "2026-07-17 Amal",
+  },
+  {
+    id: "sample-the-circus-2026-08-19",
+    district: 9,
+    title: "Workshop: Clowning, Juggling and More! Sample the Circus",
+    venue: "Bernal Heights Branch Library, 500 Cortland Ave",
+    date: "2026-08-19",
+    time: "5:00 – 6:30 PM",
+    url: "https://sfpl.org/events/2026/08/19/workshop-clowning-juggling-and-more-sample-circus",
+    verified: "2026-07-17 Amal",
+  },
 ];
 
 /** Upcoming, verified events within the next `days` days. */
