@@ -84,6 +84,7 @@ export default function EventsCalendar({ lang, setLang }) {
             <h2 style={{ ...serif, fontSize: 36, fontWeight: 400, color: C.ink, lineHeight: 1.1, marginTop: 22 }}>
               {t.evLabel}
             </h2>
+            <p style={{ ...sans, fontSize: 12, color: C.muted, marginTop: 10 }}>{t.evLangNote}</p>
 
             <div style={{ marginTop: 26 }}>
               <label htmlFor="district-filter" style={{ ...caps, fontSize: 10, color: C.muted, display: "block", marginBottom: 8 }}>
@@ -149,6 +150,11 @@ export default function EventsCalendar({ lang, setLang }) {
                             {t.districtFmt.replace("{n}", e.district)}
                           </span>
                         </div>
+                        {e.desc && e.desc[lang] && (
+                          <div style={{ ...serif, fontStyle: "italic", fontSize: 14.5, color: C.muted, marginTop: 6, lineHeight: 1.5 }}>
+                            {e.desc[lang]}
+                          </div>
+                        )}
                         <div dir="ltr" style={{ ...sans, fontSize: 13, color: C.muted, marginTop: 6, unicodeBidi: "isolate", textAlign: rtl ? "right" : "left" }}>
                           {e.time} · {e.venue}
                         </div>

@@ -24,6 +24,7 @@
 export const EVENTS = [
   {
     id: "aids-quilt-workshop-2026-08-01",
+    desc: { ar: "ورشة عمل لترميم وصنع ألواح لحاف النصب التذكاري للإيدز — لا حاجة لخبرة في الخياطة." },
     district: 5,
     title: "National AIDS Memorial Quilt Repair & Panel Making Workshop",
     venue: "Main Library, Steve Silver Music Center (4th Fl), 100 Larkin St",
@@ -34,6 +35,7 @@ export const EVENTS = [
   },
   {
     id: "craft-club-asl-2026-07-25",
+    desc: { ar: "نادي الحرف اليدوية بلغة الإشارة الأمريكية — لجميع الأعمار." },
     district: 5,
     title: "Craft Club in American Sign Language (ASL)",
     venue: "Main Library, 100 Larkin St",
@@ -44,6 +46,7 @@ export const EVENTS = [
   },
   {
     id: "chinese-games-club-2026-08-03",
+    desc: { ar: "نادي الشطرنج والألعاب باللغة الصينية." },
     district: 5,
     title: "活動：棋樂無窮 (Chess & Games Club in Chinese)",
     venue: "Main Library, 100 Larkin St",
@@ -54,6 +57,7 @@ export const EVENTS = [
   },
   {
     id: "main-library-tour-2026-08-07",
+    desc: { ar: "جولة تعريفية في المكتبة الرئيسية." },
     district: 5,
     title: "Main Library Tour",
     venue: "Main Library, 100 Larkin St",
@@ -64,6 +68,7 @@ export const EVENTS = [
   },
   {
     id: "manongs-manangs-tribute-2026-08-08",
+    desc: { ar: "احتفال بمجتمع الفلبينيين الأمريكيين وتكريم روّاده الأوائل." },
     district: 5,
     title: "Building Communities — A Tribute to Our Manongs and Manangs",
     venue: "Main Library, 100 Larkin St",
@@ -74,6 +79,7 @@ export const EVENTS = [
   },
   {
     id: "waris-shahs-heer-2026-08-29",
+    desc: { ar: "عرض فني لملحمة «هير» للشاعر وارث شاه." },
     district: 5,
     title: "Performance: Waris Shah's Heer",
     venue: "Main Library, 100 Larkin St",
@@ -84,6 +90,7 @@ export const EVENTS = [
   },
   {
     id: "aids-quilt-workshop-2026-09-05",
+    desc: { ar: "ورشة عمل لترميم وصنع ألواح لحاف النصب التذكاري للإيدز — لا حاجة لخبرة في الخياطة." },
     district: 5,
     title: "National AIDS Memorial Quilt Repair & Panel Making Workshop",
     venue: "Main Library, Steve Silver Music Center (4th Fl), 100 Larkin St",
@@ -94,6 +101,7 @@ export const EVENTS = [
   },
   {
     id: "film-chinatown-2026-09-12",
+    desc: { ar: "عرض فيلم «Chinatown» (1995)." },
     district: 5,
     title: "Film: Chinatown (1995)",
     venue: "Main Library, 100 Larkin St",
@@ -104,6 +112,7 @@ export const EVENTS = [
   },
   {
     id: "painting-big-feelings-2026-07-25",
+    desc: { ar: "ورشة رسم للتعبير عن المشاعر — لجميع الأعمار." },
     district: 9,
     title: "Workshop: Painting Big Feelings",
     venue: "Bernal Heights Branch Library, 500 Cortland Ave",
@@ -114,6 +123,7 @@ export const EVENTS = [
   },
   {
     id: "sample-the-circus-2026-08-19",
+    desc: { ar: "ورشة فنون السيرك: التهريج والألعاب البهلوانية — لجميع الأعمار." },
     district: 9,
     title: "Workshop: Clowning, Juggling and More! Sample the Circus",
     venue: "Bernal Heights Branch Library, 500 Cortland Ave",
@@ -124,6 +134,7 @@ export const EVENTS = [
   },
   {
     id: "diapason-resonancia-2026-08-01",
+    desc: { ar: "عرض موسيقي لاتيني لجميع الأعمار." },
     district: 5,
     title: "DíaPaSón presents La reSONancia del Barrio",
     venue: "Park Branch Library, 1833 Page St",
@@ -134,6 +145,7 @@ export const EVENTS = [
   },
   {
     id: "creating-music-ai-2026-08-23",
+    desc: { ar: "ورشة إنشاء الموسيقى باستخدام الذكاء الاصطناعي." },
     district: 9,
     title: "Workshop: Creating Music with AI",
     venue: "Portola Branch Library, 380 Bacon St",
@@ -144,6 +156,7 @@ export const EVENTS = [
   },
   {
     id: "tiny-art-dropin-2026-09-12",
+    desc: { ar: "جلسة رسم حرة بالألوان المائية على لوحات صغيرة." },
     district: 9,
     title: "Tiny Art Painting Canvas and Watercolor Drop-In",
     venue: "Portola Branch Library, 380 Bacon St",
@@ -154,6 +167,7 @@ export const EVENTS = [
   },
   {
     id: "tiny-art-reception-2026-09-26",
+    desc: { ar: "حفل استقبال لمعرض الفن الصغير — مفتوح للجميع." },
     district: 9,
     title: "Tiny Art Show Reception",
     venue: "Portola Branch Library, 380 Bacon St",
