@@ -146,11 +146,13 @@ function DateLeaf({ iso, lang }) {
   );
 }
 
-export default function EventsCalendar({ lang, setLang }) {
+export default function EventsCalendar({ lang, setLang, presetDistrict = null }) {
   const t = T[lang];
   const rtl = lang === "ar";
   const [params] = useSearchParams();
-  const initial = isActive(params.get("d")) ? Number(params.get("d")) : null;
+  const initial = presetDistrict !== null
+    ? presetDistrict
+    : isActive(params.get("d")) ? Number(params.get("d")) : null;
   const [filter, setFilter] = useState(initial);
   const [dayFilter, setDayFilter] = useState(null);
 

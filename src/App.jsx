@@ -411,37 +411,19 @@ function DistrictView({ district, lang, setLang }) {
           </div>
         </section>
 
-        {upcomingEvents(d).length > 0 && (
-          <section style={{ paddingBottom: 56, ...fade(0.5) }}>
-            <SectionLabel>{t.evLabel}</SectionLabel>
-            <div style={{ borderTop: `1px solid ${C.hairline}` }}>
-              {upcomingEvents(d).slice(0, 3).map((e) => (
-                <a
-                  key={e.id}
-                  href={e.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => { if (window.umami) window.umami.track("event_tap", { event: e.id, district: d }); }}
-                  style={{ display: "block", textDecoration: "none", padding: "16px 0", borderBottom: `1px solid ${C.hairline}` }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                    <span style={{ ...serif, fontSize: 17, color: C.ink }}>{e.title}</span>
-                    <span style={{ ...caps, fontSize: 9.5, color: C.gold, alignSelf: "center" }}>{relDays(e.date, lang)}</span>
-                  </div>
-                  {e.desc && e.desc[lang] && (
-                    <div style={{ ...serif, fontStyle: "italic", fontSize: 13.5, color: C.muted, marginTop: 4 }}>{e.desc[lang]}</div>
-                  )}
-                  <div dir="ltr" style={{ ...sans, fontSize: 12.5, color: C.muted, marginTop: 5, unicodeBidi: "isolate", textAlign: rtl ? "right" : "left" }}>
-                    {new Date(e.date + "T00:00:00").toLocaleDateString(lang === "en" ? "en-US" : lang === "zh" ? "zh-CN" : lang, { weekday: "short", month: "short", day: "numeric" })} · {e.time} · {e.venue}
-                  </div>
-                </a>
-              ))}
-            </div>
-            <Link to={"/events?d=" + d} style={{ ...sans, fontSize: 12.5, color: C.gold, display: "inline-block", marginTop: 16, textDecoration: "none" }}>
-              {t.evView} {rtl ? "←" : "→"}
-            </Link>
-          </section>
-        )}
+        <section style={{ paddingBottom: 56, ...fade(0.5) }}>
+          <SectionLabel>{t.evLabel}</SectionLabel>
+          <Link
+            to={"/district/" + d + "/events" }
+            onClick={() => { if (window.umami) window.umami.track("events_open", { district: d }); }}
+            style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, textDecoration: "none", padding: "18px 0", borderTop: `1px solid ${C.hairline}`, borderBottom: `1px solid ${C.hairline}` }}
+          >
+            <span style={{ ...serif, fontSize: 17.5, color: C.ink }}>
+              {t.evView} ({upcomingEvents(d).length})
+            </span>
+            <span style={{ ...sans, fontSize: 16, color: C.gold }}>{rtl ? "←" : "→"}</span>
+          </Link>
+        </section>
 
         <section style={{ paddingTop: 56, ...fade(0.65) }}>
           <SectionLabel>{t.pickerLabel}</SectionLabel>
@@ -467,9 +449,6 @@ function DistrictView({ district, lang, setLang }) {
               </Link>
             ))}
           </div>
-          <Link to="/events" style={{ ...sans, fontSize: 12.5, color: C.gold, display: "inline-block", marginTop: 18, textDecoration: "none" }}>
-            {t.evView} {rtl ? "←" : "→"}
-          </Link>
         </section>
 
         <footer style={{ paddingTop: 48, textAlign: "center", ...fade(0.7) }}>
@@ -551,6 +530,13 @@ function Report311Page({ district, lang, setLang }) {
   );
 }
 
+function DistrictEventsRoute({ lang, setLang }) {
+  const { id } = useParams();
+  const district = getDistrict(id);
+  if (!district || !isActive(district.id)) return <Navigate to="/" replace />;
+  return <EventsCalendar key={district.id} lang={lang} setLang={setLang} presetDistrict={district.id} />;
+}
+
 function Report311Route({ lang, setLang }) {
   const { id } = useParams();
   const district = getDistrict(id);
@@ -576,6 +562,7 @@ export default function App() {
         <Route path="/" element={<DistrictView key="home" district={home} lang={lang} setLang={setLang} />} />
         <Route path="/district/:id" element={<DistrictRoute lang={lang} setLang={setLang} />} />
         <Route path="/district/:id/report" element={<Report311Route lang={lang} setLang={setLang} />} />
+        <Route path="/district/:id/events" element={<DistrictEventsRoute lang={lang} setLang={setLang} />} />
         <Route path="/apply/:slug" element={<ProgramGuideRoute lang={lang} setLang={setLang} />} />
         <Route path="/events" element={<EventsCalendar lang={lang} setLang={setLang} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
