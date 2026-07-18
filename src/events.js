@@ -132,6 +132,36 @@ export const EVENTS = [
     url: "https://sfpl.org/events/2026/08/01/performance-diapason-presents-la-resonancia-del-barrio",
     verified: "2026-07-17 Amal",
   },
+  {
+    id: "creating-music-ai-2026-08-23",
+    district: 9,
+    title: "Workshop: Creating Music with AI",
+    venue: "Portola Branch Library, 380 Bacon St",
+    date: "2026-08-23",
+    time: "2:00 – 4:00 PM",
+    url: "https://sfpl.org/events/2026/08/23/workshop-creating-music-ai",
+    verified: "2026-07-17 Amal",
+  },
+  {
+    id: "tiny-art-dropin-2026-09-12",
+    district: 9,
+    title: "Tiny Art Painting Canvas and Watercolor Drop-In",
+    venue: "Portola Branch Library, 380 Bacon St",
+    date: "2026-09-12",
+    time: "3:00 – 4:00 PM",
+    url: "https://sfpl.org/events/2026/09/12/activity-tiny-art-painting-canvas-and-watercolor-drop",
+    verified: "2026-07-17 Amal",
+  },
+  {
+    id: "tiny-art-reception-2026-09-26",
+    district: 9,
+    title: "Tiny Art Show Reception",
+    venue: "Portola Branch Library, 380 Bacon St",
+    date: "2026-09-26",
+    time: "2:00 – 3:00 PM",
+    url: "https://sfpl.org/events/2026/09/26/celebration-tiny-art-show-reception",
+    verified: "2026-07-17 Amal",
+  },
 ];
 
 /** Upcoming, verified events within the next `days` days. */
