@@ -416,7 +416,7 @@ function DistrictView({ district, lang, setLang }) {
                   style={{ display: "block", textDecoration: "none", padding: "16px 0", borderBottom: `1px solid ${C.hairline}` }}
                 >
                   <div style={{ ...serif, fontSize: 17, color: C.ink }}>{e.title}</div>
-                  <div style={{ ...sans, fontSize: 12.5, color: C.muted, marginTop: 5 }}>
+                  <div dir="ltr" style={{ ...sans, fontSize: 12.5, color: C.muted, marginTop: 5, unicodeBidi: "isolate", textAlign: rtl ? "right" : "left" }}>
                     {new Date(e.date + "T00:00:00").toLocaleDateString(lang === "en" ? "en-US" : lang === "zh" ? "zh-CN" : lang, { weekday: "short", month: "short", day: "numeric" })} · {e.time} · {e.venue}
                   </div>
                 </a>

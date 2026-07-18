@@ -149,7 +149,7 @@ export default function EventsCalendar({ lang, setLang }) {
                             {t.districtFmt.replace("{n}", e.district)}
                           </span>
                         </div>
-                        <div style={{ ...sans, fontSize: 13, color: C.muted, marginTop: 6 }}>
+                        <div dir="ltr" style={{ ...sans, fontSize: 13, color: C.muted, marginTop: 6, unicodeBidi: "isolate", textAlign: rtl ? "right" : "left" }}>
                           {e.time} · {e.venue}
                         </div>
                       </a>
