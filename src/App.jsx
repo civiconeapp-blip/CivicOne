@@ -7,6 +7,15 @@ import ProgramGuideRoute from "./ProgramGuide.jsx";
 import EventsCalendar from "./EventsCalendar.jsx";
 import { upcomingEvents } from "./events.js";
 
+const REL_LOCALES = { en: "en-US", es: "es", zh: "zh-CN", vi: "vi", ar: "ar" };
+function relDays(iso, lang) {
+  const d = new Date(iso + "T00:00:00");
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const n = Math.round((d - today) / 86400000);
+  return new Intl.RelativeTimeFormat(REL_LOCALES[lang] || "en-US", { numeric: "auto" }).format(n, "day");
+}
+
 
 
 /* ---------- Design tokens: "City Briefing" system ---------- */
@@ -415,7 +424,10 @@ function DistrictView({ district, lang, setLang }) {
                   onClick={() => { if (window.umami) window.umami.track("event_tap", { event: e.id, district: d }); }}
                   style={{ display: "block", textDecoration: "none", padding: "16px 0", borderBottom: `1px solid ${C.hairline}` }}
                 >
-                  <div style={{ ...serif, fontSize: 17, color: C.ink }}>{e.title}</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+                    <span style={{ ...serif, fontSize: 17, color: C.ink }}>{e.title}</span>
+                    <span style={{ ...caps, fontSize: 9.5, color: C.gold, alignSelf: "center" }}>{relDays(e.date, lang)}</span>
+                  </div>
                   {e.desc && e.desc[lang] && (
                     <div style={{ ...serif, fontStyle: "italic", fontSize: 13.5, color: C.muted, marginTop: 4 }}>{e.desc[lang]}</div>
                   )}
