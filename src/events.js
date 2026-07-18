@@ -40,7 +40,7 @@ export const EVENTS = [
     date: "2026-07-25",
     time: "1:00 – 2:00 PM",
     url: "https://sfpl.org/events/2026/07/25/activity-craft-club-american-sign-language-asl",
-    verified: "", // predicted URL — NOT yet tap-verified; do not ship until confirmed
+    verified: "2026-07-17 Amal",
   },
   {
     id: "chinese-games-club-2026-08-03",
