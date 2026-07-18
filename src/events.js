@@ -22,7 +22,16 @@
  */
 
 export const EVENTS = [
-  // No events yet — first verified batch pending Amal's checklist pass.
+  {
+    id: "aids-quilt-workshop-2026-08-01",
+    district: 5,
+    title: "National AIDS Memorial Quilt Repair & Panel Making Workshop",
+    venue: "Main Library, Steve Silver Music Center (4th Fl), 100 Larkin St",
+    date: "2026-08-01",
+    time: "12:00 – 4:00 PM",
+    url: "https://sfpl.org/events/2026/08/01/workshop-national-aids-memorial-quilt-repair-panel-making-workshop",
+    verified: "2026-07-17 Amal", // Amal opened the event page; details confirmed against it same day
+  },
 ];
 
 /** Upcoming, verified events within the next `days` days. */
