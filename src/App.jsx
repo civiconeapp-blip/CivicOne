@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Link, useParams, Navigate } from "react-r
 import { LANGS, T } from "./i18n.js";
 import ReportForm from "./ReportForm.jsx";
 import { DISTRICTS, getDistrict, isActive } from "./districts.js";
+import { translateCategory } from "./cat311.js";
 import ProgramGuideRoute from "./ProgramGuide.jsx";
 import EventsCalendar from "./EventsCalendar.jsx";
 import { upcomingEvents } from "./events.js";
@@ -335,7 +336,7 @@ function DistrictView({ district, lang, setLang }) {
           </p>
              {pulse && (
             <p dir="auto" style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.ink, margin: "0 0 22px" }}>
-              {(featured ? t.pulse : t.pulseAny.replace("{d}", d)).replace("{n}", pulse.n.toLocaleString()).replace("{c}", pulse.c)}
+              {(featured ? t.pulse : t.pulseAny.replace("{d}", d)).replace("{n}", pulse.n.toLocaleString()).replace("{c}", translateCategory(pulse.c, lang))}
             </p>
           )}
 
@@ -357,7 +358,7 @@ function DistrictView({ district, lang, setLang }) {
                   }}
                 >
                   <div>
-                    <span style={{ ...sans, fontSize: 15, fontWeight: 600, color: C.ink }}>{r.name}</span>
+                    <span style={{ ...sans, fontSize: 15, fontWeight: 600, color: C.ink }}>{translateCategory(r.name, lang)}</span>
                     <div style={{ ...sans, fontSize: 12.5, color: C.muted, marginTop: 3 }}>{r.loc}</div>
                   </div>
                   <div style={{ textAlign: "end" }}>
