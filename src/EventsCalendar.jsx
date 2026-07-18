@@ -66,8 +66,8 @@ function MonthGrid({ year, month, eventDates, selected, onSelect, lang }) {
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
   return (
-    <div style={{ minWidth: 240, flex: "1 1 240px", maxWidth: 320 }}>
-      <div style={{ ...caps, fontSize: 10.5, color: C.ink, marginBottom: 10 }}>{monthTitle}</div>
+    <div>
+      <div style={{ ...caps, fontSize: 10.5, color: C.ink, marginBottom: 10, textAlign: "center", marginTop: -30, pointerEvents: "none" }}>{monthTitle}</div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 2 }}>
         {weekdays.map((w, i) => (
           <div key={"w" + i} style={{ ...caps, fontSize: 9, color: C.muted, textAlign: "center", paddingBottom: 4 }}>
@@ -122,30 +122,6 @@ function MonthGrid({ year, month, eventDates, selected, onSelect, lang }) {
   );
 }
 
-/* ---------- Date leaf tile ---------- */
-function DateLeaf({ iso, lang }) {
-  const d = new Date(iso + "T00:00:00");
-  const locale = LOCALES[lang] || "en-US";
-  return (
-    <div
-      aria-hidden="true"
-      style={{
-        border: `1px solid ${C.hairline}`,
-        background: "#fff",
-        minWidth: 52,
-        textAlign: "center",
-        padding: "6px 8px 8px",
-        alignSelf: "flex-start",
-      }}
-    >
-      <div style={{ ...caps, fontSize: 8.5, color: C.gold }}>
-        {d.toLocaleDateString(locale, { month: "short" })}
-      </div>
-      <div style={{ ...serif, fontSize: 24, color: C.ink, lineHeight: 1.1 }}>{d.getDate()}</div>
-    </div>
-  );
-}
-
 export default function EventsCalendar({ lang, setLang, presetDistrict = null }) {
   const t = T[lang];
   const rtl = lang === "ar";
@@ -155,6 +131,7 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
     : isActive(params.get("d")) ? Number(params.get("d")) : null;
   const [filter, setFilter] = useState(initial);
   const [dayFilter, setDayFilter] = useState(null);
+  const [monthOffset, setMonthOffset] = useState(0); // 0 = current month, up to +2
 
   const allEvents = upcomingEvents(filter);
   const eventDates = new Set(allEvents.map((e) => e.date));
@@ -253,9 +230,33 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
               </select>
             </div>
 
-            <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginTop: 34, paddingBottom: 8, borderBottom: `1px solid ${C.hairline}` }}>
-              <MonthGrid year={thisY} month={thisM} eventDates={eventDates} selected={dayFilter} onSelect={setDayFilter} lang={lang} />
-              <MonthGrid year={nextY} month={nextM} eventDates={eventDates} selected={dayFilter} onSelect={setDayFilter} lang={lang} />
+            <div style={{ marginTop: 34, paddingBottom: 12, borderBottom: `1px solid ${C.hairline}`, maxWidth: 340 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                <button
+                  onClick={() => setMonthOffset(Math.max(0, monthOffset - 1))}
+                  disabled={monthOffset === 0}
+                  aria-label="Previous month"
+                  style={{ ...sans, fontSize: 18, color: monthOffset === 0 ? C.hairline : C.gold, background: "transparent", border: "none", cursor: monthOffset === 0 ? "default" : "pointer", padding: "4px 10px" }}
+                >
+                  {rtl ? "›" : "‹"}
+                </button>
+                <button
+                  onClick={() => setMonthOffset(Math.min(2, monthOffset + 1))}
+                  disabled={monthOffset === 2}
+                  aria-label="Next month"
+                  style={{ ...sans, fontSize: 18, color: monthOffset === 2 ? C.hairline : C.gold, background: "transparent", border: "none", cursor: monthOffset === 2 ? "default" : "pointer", padding: "4px 10px" }}
+                >
+                  {rtl ? "‹" : "›"}
+                </button>
+              </div>
+              <MonthGrid
+                year={new Date(thisY, thisM + monthOffset, 1).getFullYear()}
+                month={new Date(thisY, thisM + monthOffset, 1).getMonth()}
+                eventDates={eventDates}
+                selected={dayFilter}
+                onSelect={setDayFilter}
+                lang={lang}
+              />
             </div>
 
             {dayFilter && (
@@ -274,7 +275,7 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
             ) : (
               <div style={{ marginTop: 30 }}>
                 {Object.keys(byDate).map((date) => (
-                  <div key={date} style={{ marginBottom: 34 }}>
+                  <div key={date} style={{ marginBottom: 22 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, borderBottom: `1px solid ${C.hairline}`, paddingBottom: 8 }}>
                       <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>{dateHeading(date, lang)}</span>
                       <span style={{ ...sans, fontSize: 12, color: C.muted }}>{relativeLabel(date, lang)}</span>
@@ -286,16 +287,15 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={() => { if (window.umami) window.umami.track("event_tap", { event: e.id, district: e.district }); }}
-                        style={{ display: "flex", gap: 16, textDecoration: "none", padding: "16px 0", borderBottom: `1px solid ${C.hairline}` }}
+                        style={{ display: "block", textDecoration: "none", padding: "14px 0", borderBottom: `1px solid ${C.hairline}` }}
                       >
-                        <DateLeaf iso={e.date} lang={lang} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                            <span style={{ ...serif, fontSize: 17.5, color: C.ink }}>{e.title}</span>
-                            <span style={{ ...caps, fontSize: 9.5, color: C.muted, alignSelf: "center" }}>
+                        <div style={{ minWidth: 0 }}>
+                          <span style={{ ...serif, fontSize: 17.5, color: C.ink }}>{e.title}</span>
+                          {filter === null && (
+                            <span style={{ ...caps, fontSize: 9, color: C.gold, marginInlineStart: 10 }}>
                               {t.districtFmt.replace("{n}", e.district)}
                             </span>
-                          </div>
+                          )}
                           {e.desc && e.desc[lang] && (
                             <div style={{ ...serif, fontStyle: "italic", fontSize: 14.5, color: C.muted, marginTop: 6, lineHeight: 1.5 }}>
                               {e.desc[lang]}
