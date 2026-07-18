@@ -122,6 +122,16 @@ export const EVENTS = [
     url: "https://sfpl.org/events/2026/08/19/workshop-clowning-juggling-and-more-sample-circus",
     verified: "2026-07-17 Amal",
   },
+  {
+    id: "diapason-resonancia-2026-08-01",
+    district: 5,
+    title: "DíaPaSón presents La reSONancia del Barrio",
+    venue: "Park Branch Library, 1833 Page St",
+    date: "2026-08-01",
+    time: "3:00 – 3:45 PM",
+    url: "https://sfpl.org/events/2026/08/01/performance-diapason-presents-la-resonancia-del-barrio",
+    verified: "2026-07-17 Amal",
+  },
 ];
 
 /** Upcoming, verified events within the next `days` days. */
