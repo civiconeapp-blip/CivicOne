@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { BrowserRouter, Routes, Route, Link, useParams, Navigate } from "react-router-dom";
 import { LANGS, T } from "./i18n.js";
 import ReportForm from "./ReportForm.jsx";
@@ -7,6 +7,49 @@ import { translateCategory } from "./cat311.js";
 import ProgramGuideRoute from "./ProgramGuide.jsx";
 import EventsCalendar from "./EventsCalendar.jsx";
 import { upcomingEvents } from "./events.js";
+
+/* ---------- Phase 2: device-side personalization (no accounts, nothing sent to any server) ---------- */
+const LANG_KEY = "civicone.lang";
+const DISTRICT_KEY = "civicone.district";
+const LANG_CODES = LANGS.map((l) => l.code);
+
+// <html lang> values. Chinese ships Traditional (zh-Hant) everywhere.
+const HTML_LANG = { en: "en", es: "es", zh: "zh-Hant", vi: "vi", ar: "ar" };
+
+// First-visit guess from the browser's preferred languages. Maps only to the
+// five supported codes; defaults to English. Never overrides a saved choice —
+// that check lives in getInitialLang().
+function guessLang() {
+  const list =
+    (typeof navigator !== "undefined" &&
+      (navigator.languages && navigator.languages.length
+        ? navigator.languages
+        : [navigator.language])) ||
+    [];
+  for (const raw of list) {
+    const primary = String(raw || "").toLowerCase().split("-")[0];
+    if (LANG_CODES.includes(primary)) return primary;
+  }
+  return "en";
+}
+
+function getInitialLang() {
+  try {
+    const saved = localStorage.getItem(LANG_KEY);
+    if (saved && LANG_CODES.includes(saved)) return saved; // saved choice always wins
+  } catch (e) {}
+  return guessLang();
+}
+
+// A stored district id, but only if it is still an active district.
+function getStoredDistrict() {
+  try {
+    const raw = localStorage.getItem(DISTRICT_KEY);
+    const n = Number(raw);
+    if (raw && Number.isInteger(n) && isActive(n)) return n;
+  } catch (e) {}
+  return null;
+}
 
 const REL_LOCALES = { en: "en-US", es: "es", zh: "zh-CN", vi: "vi", ar: "ar" };
 function relDays(iso, lang) {
@@ -434,7 +477,10 @@ function DistrictView({ district, lang, setLang }) {
               <Link
                 key={dd.id}
                 to={"/district/" + dd.id}
-                onClick={() => { if (window.umami) window.umami.track("district_switch", { district: dd.id }); }}
+                onClick={() => {
+                  try { localStorage.setItem(DISTRICT_KEY, String(dd.id)); } catch (e) {}
+                  if (window.umami) window.umami.track("district_switch", { district: dd.id });
+                }}
                 style={{
                   textDecoration: "none",
                   border: `1px solid ${dd.id === d ? C.gold : C.hairline}`,
@@ -553,14 +599,53 @@ function DistrictRoute({ lang, setLang }) {
   return <DistrictView key={district.id} district={district} lang={lang} setLang={setLang} />;
 }
 
+/* ---------- Home route: honor a remembered district ---------- */
+function HomeRoute({ lang, setLang }) {
+  const stored = getStoredDistrict();
+  // D5 is the home/flagship view already rendered at "/", so only redirect away
+  // for a different remembered district. Home stays reachable via the picker.
+  const remembered = stored && stored !== 5 ? stored : null;
+  useEffect(() => {
+    if (remembered && window.umami) {
+      window.umami.track("district_remembered", { district: remembered });
+    }
+  }, [remembered]);
+  if (remembered) return <Navigate to={"/district/" + remembered} replace />;
+  return <DistrictView key="home" district={getDistrict(5)} lang={lang} setLang={setLang} />;
+}
+
 /* ---------- App: router + shared language state ---------- */
 export default function App() {
-  const [lang, setLang] = useState("en");
-  const home = getDistrict(5);
+  const [lang, setLangState] = useState(getInitialLang); // 2a/2b: saved choice, else guess
+  const pendingScroll = useRef(null);
+
+  const setLang = (code) => {
+    pendingScroll.current = window.scrollY; // 2e: hold scroll across the switch
+    setLangState(code);
+    try { localStorage.setItem(LANG_KEY, code); } catch (e) {} // 2a: persist explicit choice
+  };
+
+  // 2d: keep <html lang>/<dir> in sync (screen-reader pronunciation + SEO).
+  // Layout effect so Arabic (RTL) never flashes LTR on load.
+  useLayoutEffect(() => {
+    const el = document.documentElement;
+    el.lang = HTML_LANG[lang] || "en";
+    el.dir = lang === "ar" ? "rtl" : "ltr";
+  }, [lang]);
+
+  // 2e: a language switch doesn't navigate, so restore the exact scroll offset
+  // in case reflowed copy would otherwise shift the viewport.
+  useLayoutEffect(() => {
+    if (pendingScroll.current != null) {
+      window.scrollTo(0, pendingScroll.current);
+      pendingScroll.current = null;
+    }
+  }, [lang]);
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<DistrictView key="home" district={home} lang={lang} setLang={setLang} />} />
+        <Route path="/" element={<HomeRoute lang={lang} setLang={setLang} />} />
         <Route path="/district/:id" element={<DistrictRoute lang={lang} setLang={setLang} />} />
         <Route path="/district/:id/report" element={<Report311Route lang={lang} setLang={setLang} />} />
         <Route path="/district/:id/events" element={<DistrictEventsRoute lang={lang} setLang={setLang} />} />
