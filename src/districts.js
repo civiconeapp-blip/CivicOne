@@ -21,7 +21,7 @@ export const SFBOS_ROOT = "https://sfbos.org";
  * below (data verified, links tap-checked) — re-activating one is a
  * one-number edit here, no re-verification needed.
  */
-export const ACTIVE_DISTRICTS = [5, 6, 9];
+export const ACTIVE_DISTRICTS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
 export function isActive(id) {
   return ACTIVE_DISTRICTS.includes(Number(id));
