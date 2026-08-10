@@ -51,17 +51,6 @@ function getStoredDistrict() {
   return null;
 }
 
-const REL_LOCALES = { en: "en-US", es: "es", zh: "zh-CN", vi: "vi", ar: "ar" };
-function relDays(iso, lang) {
-  const d = new Date(iso + "T00:00:00");
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const n = Math.round((d - today) / 86400000);
-  return new Intl.RelativeTimeFormat(REL_LOCALES[lang] || "en-US", { numeric: "auto" }).format(n, "day");
-}
-
-
-
 /* ---------- Design tokens: "City Briefing" system ---------- */
 const C = {
   paper: "#F7F5F0",
@@ -211,9 +200,6 @@ function DistrictView({ district, lang, setLang }) {
   const d = district.id;
   const featured = !!district.featured;
   const [loaded, setLoaded] = useState(false);
-  const [requests, setRequests] = useState(null);
-  const [fetchError, setFetchError] = useState(false);
-  const [pulse, setPulse] = useState(null);
 
   const t = T[lang];
   const rtl = lang === "ar";
@@ -221,74 +207,6 @@ function DistrictView({ district, lang, setLang }) {
   useEffect(() => {
     setLoaded(true);
   }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      try {
-        const token = import.meta.env.VITE_DATASF_TOKEN;
-        const base = datasfUrl(d);
-        const url = token ? `${base}&$$app_token=${token}` : base;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`DataSF responded ${res.status}`);
-        const rows = await res.json();
-        if (cancelled) return;
-        setRequests(
-          rows.map((r) => ({
-            id: r.service_request_id || "—",
-            name: r.service_name || r.service_subtype || t.requestFallback,
-            loc: r.address || r.neighborhoods_sffind_boundaries || t.districtFmt.replace("{n}", d),
-            status: statusKey(r.status_description),
-            date: r.requested_datetime ? r.requested_datetime.slice(0, 10) : "",
-          }))
-        );
-      } catch (e) {
-        if (!cancelled) {
-          setFetchError(true);
-          setRequests([]);
-        }
-      }
-    }
-    setRequests(null);
-    setFetchError(false);
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, [d, lang]);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadPulse() {
-      try {
-        const since = new Date(Date.now() - 7 * 24 * 3600 * 1000)
-          .toISOString()
-          .slice(0, 19);
-                const params = new URLSearchParams({
-          $select: "service_name,count(*) as n",
-          $where: "supervisor_district=" + d + " AND requested_datetime > '" + since + "'",
-          $group: "service_name",
-          $order: "n DESC",
-          $limit: "50",
-        });
-        const token = import.meta.env.VITE_DATASF_TOKEN;
-        if (token) params.set("$$app_token", token);
-        const res = await fetch(
-          "https://data.sfgov.org/resource/vw6y-z8j6.json?" + params.toString()
-        );
-        if (!res.ok) return;
-        const rows = await res.json();
-        if (cancelled || !Array.isArray(rows) || rows.length === 0) return;
-        const total = rows.reduce((s, r) => s + Number(r.n || 0), 0);
-        if (total > 0) setPulse({ n: total, c: rows[0].service_name });
-      } catch (e) {}
-    }
-    setPulse(null);
-    loadPulse();
-    return () => {
-      cancelled = true;
-    };
-  }, [d]);
 
   const fade = (delay) => ({
     opacity: loaded ? 1 : 0,
@@ -314,9 +232,10 @@ function DistrictView({ district, lang, setLang }) {
             <h1 style={{ ...serif, fontSize: 34, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em" }}>
               Civic One
             </h1>
-            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label={t.langNav}>
               {LANGS.map((l) => (
                 <button
+                  type="button"
                   key={l.code}
                                     onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
 
@@ -369,63 +288,6 @@ function DistrictView({ district, lang, setLang }) {
             <p style={{ ...serif, fontStyle: "italic", fontSize: 15, color: C.muted, marginTop: 20 }}>
               {t.programsSoon}
             </p>
-          )}
-        </section>
-
- <section style={{ paddingBottom: 64, ...fade(0.4) }}>
-          <SectionLabel>{t.ledgerLabel}</SectionLabel>
-          <p style={{ ...sans, fontSize: 11.5, color: C.muted, margin: "-16px 0 20px" }}>
-            {fetchError ? t.ledgerError : featured ? t.ledgerNote : t.ledgerNoteAny.replace("{d}", d)}
-          </p>
-             {pulse && (
-            <p dir="auto" style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.ink, margin: "0 0 22px" }}>
-              {(featured ? t.pulse : t.pulseAny.replace("{d}", d)).replace("{n}", pulse.n.toLocaleString()).replace("{c}", translateCategory(pulse.c, lang))}
-            </p>
-          )}
-
-          {requests === null && (
-            <p style={{ ...serif, fontStyle: "italic", fontSize: 15, color: C.muted }}>{t.loading}</p>
-          )}
-
-          {requests && requests.length > 0 && (
-            <div style={{ borderTop: `1px solid ${C.hairline}` }}>
-              {requests.map((r) => (
-                <div
-                  key={r.id}
-                  style={{
-                    padding: "16px 0",
-                    display: "grid",
-                    gridTemplateColumns: "1fr auto",
-                    gap: 12,
-                    borderBottom: `1px solid ${C.hairline}`,
-                  }}
-                >
-                  <div>
-                    <span style={{ ...sans, fontSize: 15, fontWeight: 600, color: C.ink }}>{translateCategory(r.name, lang)}</span>
-                    <div style={{ ...sans, fontSize: 12.5, color: C.muted, marginTop: 3 }}>{r.loc}</div>
-                  </div>
-                  <div style={{ textAlign: "end" }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: 99,
-                          background: STATUS_COLOR[r.status],
-                          display: "inline-block",
-                        }}
-                      />
-                      <span style={{ ...sans, fontSize: 12, fontWeight: 600, color: STATUS_COLOR[r.status] }}>
-                        {t[r.status]}
-                      </span>
-                    </div>
-                    <div style={{ ...mono, fontSize: 11, color: C.muted, marginTop: 4 }}>
-                      № {r.id} · {r.date}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           )}
         </section>
 
@@ -514,9 +376,85 @@ function DistrictView({ district, lang, setLang }) {
 /* ---------- Dedicated 311 page ---------- */
 function Report311Page({ district, lang, setLang }) {
   const d = district.id;
+  const featured = !!district.featured;
   const t = T[lang];
   const rtl = lang === "ar";
+  const [requests, setRequests] = useState(null);
+  const [fetchError, setFetchError] = useState(false);
+  const [pulse, setPulse] = useState(null);
+
   useEffect(() => { window.scrollTo(0, 0); }, []);
+
+  // Live 311 ledger + weekly pulse (DataSF). Moved verbatim from the district
+  // page in Phase 3a: "what neighbors are reporting," shown below the report action.
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      try {
+        const token = import.meta.env.VITE_DATASF_TOKEN;
+        const base = datasfUrl(d);
+        const url = token ? `${base}&$$app_token=${token}` : base;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`DataSF responded ${res.status}`);
+        const rows = await res.json();
+        if (cancelled) return;
+        setRequests(
+          rows.map((r) => ({
+            id: r.service_request_id || "—",
+            name: r.service_name || r.service_subtype || t.requestFallback,
+            loc: r.address || r.neighborhoods_sffind_boundaries || t.districtFmt.replace("{n}", d),
+            status: statusKey(r.status_description),
+            date: r.requested_datetime ? r.requested_datetime.slice(0, 10) : "",
+          }))
+        );
+      } catch (e) {
+        if (!cancelled) {
+          setFetchError(true);
+          setRequests([]);
+        }
+      }
+    }
+    setRequests(null);
+    setFetchError(false);
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [d, lang]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadPulse() {
+      try {
+        const since = new Date(Date.now() - 7 * 24 * 3600 * 1000)
+          .toISOString()
+          .slice(0, 19);
+                const params = new URLSearchParams({
+          $select: "service_name,count(*) as n",
+          $where: "supervisor_district=" + d + " AND requested_datetime > '" + since + "'",
+          $group: "service_name",
+          $order: "n DESC",
+          $limit: "50",
+        });
+        const token = import.meta.env.VITE_DATASF_TOKEN;
+        if (token) params.set("$$app_token", token);
+        const res = await fetch(
+          "https://data.sfgov.org/resource/vw6y-z8j6.json?" + params.toString()
+        );
+        if (!res.ok) return;
+        const rows = await res.json();
+        if (cancelled || !Array.isArray(rows) || rows.length === 0) return;
+        const total = rows.reduce((s, r) => s + Number(r.n || 0), 0);
+        if (total > 0) setPulse({ n: total, c: rows[0].service_name });
+      } catch (e) {}
+    }
+    setPulse(null);
+    loadPulse();
+    return () => {
+      cancelled = true;
+    };
+  }, [d]);
+
   return (
     <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
       <div dir={rtl ? "rtl" : "ltr"} style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 80px" }}>
@@ -531,6 +469,7 @@ function Report311Page({ district, lang, setLang }) {
             <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label={t.langNav}>
               {LANGS.map((l) => (
                 <button
+                  type="button"
                   key={l.code}
                   onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
                   style={{
@@ -567,6 +506,63 @@ function Report311Page({ district, lang, setLang }) {
             </p>
           </section>
           <ReportForm t={t} />
+
+          <section style={{ paddingTop: 8, paddingBottom: 24 }}>
+            <SectionLabel>{t.ledgerLabel}</SectionLabel>
+            <p style={{ ...sans, fontSize: 11.5, color: C.muted, margin: "-16px 0 20px" }}>
+              {fetchError ? t.ledgerError : featured ? t.ledgerNote : t.ledgerNoteAny.replace("{d}", d)}
+            </p>
+            {pulse && (
+              <p dir="auto" style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.ink, margin: "0 0 22px" }}>
+                {(featured ? t.pulse : t.pulseAny.replace("{d}", d)).replace("{n}", pulse.n.toLocaleString()).replace("{c}", translateCategory(pulse.c, lang))}
+              </p>
+            )}
+
+            {requests === null && (
+              <p style={{ ...serif, fontStyle: "italic", fontSize: 15, color: C.muted }}>{t.loading}</p>
+            )}
+
+            {requests && requests.length > 0 && (
+              <div style={{ borderTop: `1px solid ${C.hairline}` }}>
+                {requests.map((r) => (
+                  <div
+                    key={r.id}
+                    style={{
+                      padding: "16px 0",
+                      display: "grid",
+                      gridTemplateColumns: "1fr auto",
+                      gap: 12,
+                      borderBottom: `1px solid ${C.hairline}`,
+                    }}
+                  >
+                    <div>
+                      <span style={{ ...sans, fontSize: 15, fontWeight: 600, color: C.ink }}>{translateCategory(r.name, lang)}</span>
+                      <div style={{ ...sans, fontSize: 12.5, color: C.muted, marginTop: 3 }}>{r.loc}</div>
+                    </div>
+                    <div style={{ textAlign: "end" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
+                        <span
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: 99,
+                            background: STATUS_COLOR[r.status],
+                            display: "inline-block",
+                          }}
+                        />
+                        <span style={{ ...sans, fontSize: 12, fontWeight: 600, color: STATUS_COLOR[r.status] }}>
+                          {t[r.status]}
+                        </span>
+                      </div>
+                      <div style={{ ...mono, fontSize: 11, color: C.muted, marginTop: 4 }}>
+                        № {r.id} · {r.date}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
         </main>
 
         <footer style={{ paddingTop: 32, textAlign: "center" }}>

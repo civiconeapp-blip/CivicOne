@@ -149,8 +149,9 @@ export default function ReportForm({ t }) {
         {t.reportIntro}
       </p>
 
-      <label style={labelStyle}>{t.rDescription}</label>
+      <label htmlFor="report-desc" style={labelStyle}>{t.rDescription}</label>
       <textarea
+        id="report-desc"
         value={desc}
         onChange={(e) => setDesc(e.target.value)}
         placeholder={t.rDescPlaceholder}
@@ -158,16 +159,17 @@ export default function ReportForm({ t }) {
         style={{ ...inputStyle, resize: "vertical" }}
       />
 
-      <label style={labelStyle}>{t.rLocation}</label>
+      <label htmlFor="report-loc" style={labelStyle}>{t.rLocation}</label>
       <input
+        id="report-loc"
         value={loc}
         onChange={(e) => setLoc(e.target.value)}
         placeholder={t.rLocPlaceholder}
         style={inputStyle}
       />
 
-      <label style={labelStyle}>{t.rCategory}</label>
-      <select value={cat} onChange={(e) => setCat(e.target.value)} style={inputStyle}>
+      <label htmlFor="report-cat" style={labelStyle}>{t.rCategory}</label>
+      <select id="report-cat" value={cat} onChange={(e) => setCat(e.target.value)} style={inputStyle}>
         <option value=""> </option>
         {CATS.map((c) => (
           <option key={c.key} value={c.key}>
@@ -181,6 +183,7 @@ export default function ReportForm({ t }) {
       )}
 
       <button
+        type="button"
         onClick={prepare}
         disabled={loading}
         style={{
@@ -259,6 +262,7 @@ export default function ReportForm({ t }) {
           </p>
           <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
             <button
+              type="button"
               onClick={copy}
               style={{
                 ...caps,

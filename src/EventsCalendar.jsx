@@ -82,6 +82,7 @@ function MonthGrid({ year, month, eventDates, selected, onSelect, lang }) {
           const isSel = selected === dIso;
           return (
             <button
+              type="button"
               key={dIso}
               onClick={() => has && onSelect(isSel ? null : dIso)}
               disabled={!has}
@@ -144,8 +145,6 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
   const now = new Date();
   const thisY = now.getFullYear();
   const thisM = now.getMonth();
-  const nextY = thisM === 11 ? thisY + 1 : thisY;
-  const nextM = (thisM + 1) % 12;
 
   return (
     <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
@@ -158,9 +157,10 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
           <div style={{ height: 1, background: C.ink, margin: "16px 0" }} />
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
             <h1 style={{ ...serif, fontSize: 28, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em" }}>Civic One</h1>
-            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label="Language">
+            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label={t.langNav}>
               {LANGS.map((l) => (
                 <button
+                  type="button"
                   key={l.code}
                   onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
                   style={{
@@ -183,8 +183,11 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
 
         <main>
           <section style={{ padding: "40px 0 0" }}>
-            <Link to="/" style={{ ...sans, fontSize: 12.5, color: C.muted, textDecoration: "none" }}>
-              {rtl ? "→" : "←"} {t.backLink}
+            <Link
+              to={presetDistrict !== null ? "/district/" + presetDistrict : "/"}
+              style={{ ...sans, fontSize: 12.5, color: C.muted, textDecoration: "none" }}
+            >
+              {rtl ? "→" : "←"} {presetDistrict !== null ? t.r311Back : t.backLink}
             </Link>
             <h2 style={{ ...serif, fontSize: 36, fontWeight: 400, color: C.ink, lineHeight: 1.1, marginTop: 22 }}>
               {t.evLabel}
@@ -233,6 +236,7 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
             <div style={{ marginTop: 34, paddingBottom: 12, borderBottom: `1px solid ${C.hairline}`, maxWidth: 340 }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
                 <button
+                  type="button"
                   onClick={() => setMonthOffset(Math.max(0, monthOffset - 1))}
                   disabled={monthOffset === 0}
                   aria-label="Previous month"
@@ -241,6 +245,7 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
                   {rtl ? "›" : "‹"}
                 </button>
                 <button
+                  type="button"
                   onClick={() => setMonthOffset(Math.min(2, monthOffset + 1))}
                   disabled={monthOffset === 2}
                   aria-label="Next month"
@@ -261,6 +266,7 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
 
             {dayFilter && (
               <button
+                type="button"
                 onClick={() => setDayFilter(null)}
                 style={{ ...caps, fontSize: 10.5, color: C.gold, background: "transparent", border: `1px solid ${C.goldLine}`, padding: "8px 14px", marginTop: 18, cursor: "pointer" }}
               >

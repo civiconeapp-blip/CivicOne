@@ -93,9 +93,10 @@ function ProgramGuideView({ program, lang, setLang }) {
             <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>{t.guideTag}</span>
           </div>
           <div style={{ height: 1, background: C.ink, margin: "16px 0" }} />
-          <nav style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }}>
+          <nav style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 16 }} aria-label={t.langNav}>
             {LANGS.map((l) => (
               <button
+                type="button"
                 key={l.code}
                 onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
                 style={{
