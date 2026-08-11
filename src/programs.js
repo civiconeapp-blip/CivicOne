@@ -145,6 +145,57 @@ export const PROGRAMS = [
     phoneLabel: "SF Human Services Agency",
     phone: "1-415-557-5000",
   },
+  // ---- Transit guide (Phase 4a): all facts verified 2026-08-10 against official
+  // sources. Structure only — fares, dollar amounts, income thresholds, and dates
+  // are intentionally NOT stated here; residents follow officialHref for specifics.
+  //   Muni fares hub:  https://www.sfmta.com/getting-around/muni/fares
+  //   Clipper:         https://www.clippercard.com/ClipperWeb/
+  //   Clipper START:   https://www.sfmta.com/fares/clipper-start  (apply: clipperstartcard.com)
+  //   Lifeline (migrating into Clipper START): https://www.sfmta.com/lifeline-low-income-pass
+  //   Free Muni (Youth / Seniors / People with Disabilities): linked from the fares hub.
+  {
+    slug: "transit",
+    navLabel: "Muni & Transit Discounts",
+    navDesc: "Riding Muni with Clipper, plus youth, senior, disability, and low-income fare programs",
+    title: "Getting Around on Muni",
+    intro:
+      "Muni is San Francisco's public transit system — buses, Metro, and cable cars. Clipper is the Bay Area's all-in-one transit card, accepted on Muni and across the region's transit systems. You can pay with a Clipper card, the MuniMobile app, cash (exact change), or a contactless bank card.",
+    eligibilityNote:
+      "Several programs lower or waive your fare. Free Muni for All Youth covers everyone 18 and younger, regardless of income or residency. Free Muni for Seniors (65+) and Free Muni for People with Disabilities cover low-to-moderate-income San Francisco residents. Clipper START gives limited-income adults ages 19-64 a discount across Bay Area transit, and the Lifeline Pass (now moving into Clipper START) is a discounted monthly pass for limited-income riders. The Access Pass provides free Muni for people experiencing homelessness.",
+    documents: [
+      "A Clipper card (the youth program needs no card or application for regular Muni service)",
+      "Proof of age for the youth and senior programs",
+      "Proof of income for the low-income programs — such as an EBT or Medi-Cal card, a county benefits letter, or last year's federal tax return",
+      "Proof of San Francisco residency for the resident programs",
+      "A Clipper Access card to apply for Free Muni for People with Disabilities",
+    ],
+    steps: [
+      {
+        title: "Get a Clipper card",
+        desc: "Clipper works on Muni and every other Bay Area transit system. Get a physical card online, or set up Clipper on your phone. Register your card after you get it, and reload value online whenever you need to.",
+      },
+      {
+        title: "Choose how to pay",
+        desc: "Tap your Clipper card, buy fares in the MuniMobile app and activate your ticket when you board, pay cash with exact change (ticket vending machines issue vouchers, not change), or tap a contactless bank card.",
+      },
+      {
+        title: "Keep your proof of payment",
+        desc: "After you pay your fare, keep your proof of payment with you for the ride.",
+      },
+      {
+        title: "See if you qualify for a discount",
+        desc: "Youth 18 and younger ride free with no application. Seniors 65+ and people with qualifying disabilities may qualify for Free Muni. Limited-income adults ages 19-64 may qualify for Clipper START, which also applies across other Bay Area transit.",
+      },
+      {
+        title: "Apply for your discount program",
+        desc: "Apply online — Clipper START at clipperstartcard.com, and the Free Muni senior and disability programs through the SFMTA application. You can also apply by paper at the SFMTA Customer Service Center, 11 South Van Ness Avenue. Check the official page for current amounts, income limits, and processing times before you apply.",
+      },
+    ],
+    officialHref: "https://www.sfmta.com/getting-around/muni/fares",
+    officialLabel: "See fares & discount programs at SFMTA.com",
+    phoneLabel: "SFMTA Muni fares & service info",
+    phone: "311 (Outside SF: 415-701-2311)", // 311 / SFMTA contact shown on the fares hub, verified 2026-08-10
+  },
 ];
 
 /**
@@ -229,6 +280,31 @@ export const PROGRAM_T = {
       officialLabel: "Solicite en BenefitsCal.com",
       phoneLabel: "Agencia de Servicios Humanos de SF",
     },
+    transit: {
+      navLabel: "Descuentos de Muni y transporte",
+      navDesc: "Viajar en Muni con Clipper, además de programas de tarifas para jóvenes, personas mayores, personas con discapacidad y de bajos ingresos",
+      title: "Cómo movilizarse en Muni",
+      intro:
+        "Muni es el sistema de transporte público de San Francisco — autobuses, Metro y tranvías de cable (cable cars). Clipper es la tarjeta de transporte todo en uno del Bay Area, aceptada en Muni y en los sistemas de transporte de toda la región. Puede pagar con una tarjeta Clipper, la aplicación MuniMobile, en efectivo (con el cambio exacto) o con una tarjeta bancaria sin contacto.",
+      eligibilityNote:
+        "Varios programas reducen o eliminan su tarifa. Free Muni for All Youth cubre a todas las personas de 18 años o menos, sin importar sus ingresos ni su residencia. Free Muni for Seniors (65+) y Free Muni for People with Disabilities cubren a los residentes de San Francisco con ingresos de bajos a moderados. Clipper START ofrece a los adultos de ingresos limitados de 19-64 años un descuento en el transporte del Bay Area, y el Lifeline Pass (que ahora se está integrando a Clipper START) es un pase mensual con descuento para pasajeros de ingresos limitados. El Access Pass ofrece Muni gratis para las personas sin hogar.",
+      documents: [
+        "Una tarjeta Clipper (el programa para jóvenes no requiere tarjeta ni solicitud para el servicio regular de Muni)",
+        "Comprobante de edad para los programas para jóvenes y personas mayores",
+        "Comprobante de ingresos para los programas de bajos ingresos — como una tarjeta EBT o Medi-Cal, una carta de beneficios del condado o la declaración de impuestos federales del año pasado",
+        "Comprobante de residencia en San Francisco para los programas para residentes",
+        "Una tarjeta Clipper Access para solicitar Free Muni for People with Disabilities",
+      ],
+      steps: [
+        { title: "Obtenga una tarjeta Clipper", desc: "Clipper funciona en Muni y en todos los demás sistemas de transporte del Bay Area. Obtenga una tarjeta física en línea o configure Clipper en su teléfono. Registre su tarjeta después de recibirla y recargue saldo en línea cuando lo necesite." },
+        { title: "Elija cómo pagar", desc: "Toque su tarjeta Clipper, compre tarifas en la aplicación MuniMobile y active su boleto al abordar, pague en efectivo con el cambio exacto (las máquinas expendedoras de boletos emiten vales, no cambio) o toque una tarjeta bancaria sin contacto." },
+        { title: "Conserve su comprobante de pago", desc: "Después de pagar su tarifa, conserve consigo su comprobante de pago durante el viaje." },
+        { title: "Verifique si califica para un descuento", desc: "Los jóvenes de 18 años o menos viajan gratis sin necesidad de solicitud. Las personas mayores (65+) y las personas con discapacidades que califican pueden reunir los requisitos para Free Muni. Los adultos de ingresos limitados de 19-64 años pueden calificar para Clipper START, que también se aplica en el resto del transporte del Bay Area." },
+        { title: "Solicite su programa de descuento", desc: "Solicite en línea — Clipper START en clipperstartcard.com, y los programas Free Muni para personas mayores y con discapacidad a través de la solicitud de SFMTA. También puede solicitar en papel en el Centro de Servicio al Cliente de SFMTA, 11 South Van Ness Avenue. Consulte la página oficial para conocer los montos actuales, los límites de ingresos y los tiempos de procesamiento antes de solicitar." },
+      ],
+      officialLabel: "Consulte las tarifas y los programas de descuento en SFMTA.com",
+      phoneLabel: "Información de tarifas y servicio de Muni de SFMTA",
+    },
   },
   zh: {
     food: {
@@ -303,6 +379,31 @@ export const PROGRAM_T = {
       ],
       officialLabel: "在 BenefitsCal.com 申請",
       phoneLabel: "舊金山人類服務局",
+    },
+    transit: {
+      navLabel: "Muni 與交通優惠",
+      navDesc: "使用 Clipper 搭乘 Muni，以及青少年、長者、殘障人士和低收入車費計劃",
+      title: "搭乘 Muni 出行",
+      intro:
+        "Muni 是 San Francisco 的公共交通系統——包括巴士、地鐵（Metro）和纜車。Clipper 是 Bay Area 的一體式交通卡，可在 Muni 及整個地區的交通系統上使用。您可以使用 Clipper 卡、MuniMobile 應用程式、現金（需準備剛好的零錢）或非接觸式銀行卡付款。",
+      eligibilityNote:
+        "有多項計劃可降低或免除您的車費。Free Muni for All Youth 涵蓋所有 18 歲及以下人士，不論收入或居住身分。Free Muni for Seniors（65+）和 Free Muni for People with Disabilities 涵蓋中低收入的 San Francisco 居民。Clipper START 為 19-64 歲的低收入成年人提供適用於整個 Bay Area 交通的優惠，而 Lifeline Pass（現正併入 Clipper START）是為低收入乘客提供的優惠月票。Access Pass 為無家可歸人士提供免費 Muni。",
+      documents: [
+        "一張 Clipper 卡（青少年計劃搭乘一般 Muni 服務無需卡片或申請）",
+        "青少年和長者計劃所需的年齡證明",
+        "低收入計劃所需的收入證明——例如 EBT 或 Medi-Cal 卡、縣府福利信函，或去年的聯邦報稅表",
+        "居民計劃所需的 San Francisco 居住證明",
+        "申請 Free Muni for People with Disabilities 所需的 Clipper Access 卡",
+      ],
+      steps: [
+        { title: "取得 Clipper 卡", desc: "Clipper 可在 Muni 及 Bay Area 每一個其他交通系統上使用。您可以在網上取得實體卡，或在手機上設定 Clipper。取得卡片後請進行登記，並在需要時隨時於網上加值。" },
+        { title: "選擇付款方式", desc: "拍卡使用 Clipper 卡、在 MuniMobile 應用程式購買車費並於上車時啟用車票、以剛好的零錢現金付款（售票機發出兌換券，不找零），或拍卡使用非接觸式銀行卡。" },
+        { title: "保留您的付款證明", desc: "付車費後，請在整趟行程中隨身保留您的付款證明。" },
+        { title: "查看您是否符合優惠資格", desc: "18 歲及以下青少年免費搭乘，無需申請。65 歲以上長者及符合資格的殘障人士可能符合 Free Muni 資格。19-64 歲的低收入成年人可能符合 Clipper START 資格，該優惠亦適用於其他 Bay Area 交通系統。" },
+        { title: "申請您的優惠計劃", desc: "在網上申請——Clipper START 請至 clipperstartcard.com，Free Muni 長者及殘障計劃則透過 SFMTA 申請。您也可以在 SFMTA 客戶服務中心（11 South Van Ness Avenue）以紙本方式申請。申請前請查看官方網頁以了解目前的金額、收入上限和處理時間。" },
+      ],
+      officialLabel: "在 SFMTA.com 查看車費與優惠計劃",
+      phoneLabel: "SFMTA Muni 車費與服務資訊",
     },
   },
   vi: {
@@ -379,6 +480,31 @@ export const PROGRAM_T = {
       officialLabel: "Nộp đơn tại BenefitsCal.com",
       phoneLabel: "Cơ quan Dịch vụ Nhân sinh SF",
     },
+    transit: {
+      navLabel: "Giảm giá Muni & Giao thông",
+      navDesc: "Đi Muni bằng Clipper, cùng các chương trình vé cho thanh thiếu niên, người cao tuổi, người khuyết tật và người thu nhập thấp",
+      title: "Đi lại bằng Muni",
+      intro:
+        "Muni là hệ thống giao thông công cộng của San Francisco — xe buýt, Metro và xe cáp (cable car). Clipper là thẻ giao thông tất-cả-trong-một của Bay Area, được chấp nhận trên Muni và khắp các hệ thống giao thông trong khu vực. Bạn có thể thanh toán bằng thẻ Clipper, ứng dụng MuniMobile, tiền mặt (đúng số tiền), hoặc thẻ ngân hàng không tiếp xúc.",
+      eligibilityNote:
+        "Một số chương trình giảm hoặc miễn tiền vé cho bạn. Free Muni for All Youth áp dụng cho tất cả mọi người từ 18 tuổi trở xuống, bất kể thu nhập hay nơi cư trú. Free Muni for Seniors (65+) và Free Muni for People with Disabilities áp dụng cho cư dân San Francisco có thu nhập thấp đến trung bình. Clipper START giảm giá cho người trưởng thành có thu nhập hạn chế trong độ tuổi 19-64 trên khắp hệ thống giao thông Bay Area, còn Lifeline Pass (nay đang chuyển sang Clipper START) là vé tháng giảm giá cho người đi xe có thu nhập hạn chế. Access Pass cung cấp Muni miễn phí cho người đang trong tình trạng vô gia cư.",
+      documents: [
+        "Một thẻ Clipper (chương trình dành cho thanh thiếu niên không cần thẻ hay đơn đăng ký cho dịch vụ Muni thông thường)",
+        "Bằng chứng tuổi cho chương trình dành cho thanh thiếu niên và người cao tuổi",
+        "Bằng chứng thu nhập cho các chương trình dành cho người thu nhập thấp — chẳng hạn thẻ EBT hoặc Medi-Cal, thư trợ cấp của quận, hoặc tờ khai thuế liên bang năm ngoái",
+        "Bằng chứng cư trú tại San Francisco cho các chương trình dành cho cư dân",
+        "Một thẻ Clipper Access để nộp đơn xin Free Muni for People with Disabilities",
+      ],
+      steps: [
+        { title: "Lấy thẻ Clipper", desc: "Clipper hoạt động trên Muni và mọi hệ thống giao thông khác của Bay Area. Lấy thẻ cứng trực tuyến, hoặc thiết lập Clipper trên điện thoại của bạn. Đăng ký thẻ sau khi nhận, và nạp tiền trực tuyến bất cứ khi nào bạn cần." },
+        { title: "Chọn cách thanh toán", desc: "Chạm thẻ Clipper, mua vé trong ứng dụng MuniMobile và kích hoạt vé khi lên xe, trả tiền mặt đúng số tiền (máy bán vé tự động phát phiếu (voucher), không thối tiền), hoặc chạm thẻ ngân hàng không tiếp xúc." },
+        { title: "Giữ bằng chứng thanh toán của bạn", desc: "Sau khi trả tiền vé, hãy giữ bằng chứng thanh toán bên mình trong suốt chuyến đi." },
+        { title: "Xem bạn có đủ điều kiện được giảm giá không", desc: "Thanh thiếu niên từ 18 tuổi trở xuống đi miễn phí mà không cần nộp đơn. Người cao tuổi 65+ và người khuyết tật đủ điều kiện có thể được hưởng Free Muni. Người trưởng thành có thu nhập hạn chế trong độ tuổi 19-64 có thể đủ điều kiện cho Clipper START, cũng áp dụng trên các hệ thống giao thông khác của Bay Area." },
+        { title: "Nộp đơn cho chương trình giảm giá của bạn", desc: "Nộp đơn trực tuyến — Clipper START tại clipperstartcard.com, và các chương trình Free Muni cho người cao tuổi và người khuyết tật qua đơn đăng ký của SFMTA. Bạn cũng có thể nộp đơn bằng giấy tại SFMTA Customer Service Center, 11 South Van Ness Avenue. Hãy kiểm tra trang chính thức để biết mức hỗ trợ, giới hạn thu nhập và thời gian xử lý hiện tại trước khi nộp đơn." },
+      ],
+      officialLabel: "Xem tiền vé & các chương trình giảm giá tại SFMTA.com",
+      phoneLabel: "Thông tin tiền vé & dịch vụ Muni của SFMTA",
+    },
   },
   ar: {
     food: {
@@ -453,6 +579,31 @@ export const PROGRAM_T = {
       ],
       officialLabel: "قدّم على BenefitsCal.com",
       phoneLabel: "وكالة الخدمات الإنسانية في سان فرانسيسكو",
+    },
+    transit: {
+      navLabel: "تخفيضات Muni والنقل العام",
+      navDesc: "ركوب Muni باستخدام Clipper، بالإضافة إلى برامج الأجرة للشباب وكبار السن وذوي الإعاقة وذوي الدخل المحدود",
+      title: "التنقّل باستخدام Muni",
+      intro:
+        "Muni هو نظام النقل العام في San Francisco — الحافلات وMetro والترام (cable cars). وClipper هي بطاقة النقل الشاملة في Bay Area، وهي مقبولة على Muni وفي جميع أنظمة النقل في المنطقة. يمكنك الدفع باستخدام بطاقة Clipper، أو تطبيق MuniMobile، أو نقدًا (بالمبلغ المضبوط تمامًا)، أو ببطاقة مصرفية لا تلامسية.",
+      eligibilityNote:
+        "تعمل عدة برامج على تخفيض أجرتك أو إعفائك منها. يغطّي برنامج Free Muni for All Youth كل شخص عمره 18 عامًا أو أقل، بغض النظر عن الدخل أو الإقامة. ويغطّي برنامجا Free Muni for Seniors (65+) وFree Muni for People with Disabilities سكان San Francisco من ذوي الدخل المنخفض إلى المتوسط. ويمنح Clipper START البالغين من ذوي الدخل المحدود الذين تتراوح أعمارهم بين 19-64 عامًا تخفيضًا عبر وسائل النقل في Bay Area، وبطاقة Lifeline Pass (التي يجري الآن دمجها ضمن Clipper START) هي بطاقة اشتراك شهرية مخفّضة للركاب ذوي الدخل المحدود. وتوفّر Access Pass خدمة Muni مجانية للأشخاص الذين يعانون من التشرّد.",
+      documents: [
+        "بطاقة Clipper (لا يحتاج برنامج الشباب إلى بطاقة أو طلب للحصول على خدمة Muni العادية)",
+        "إثبات العمر لبرنامجي الشباب وكبار السن",
+        "إثبات الدخل لبرامج ذوي الدخل المنخفض — مثل بطاقة EBT أو Medi-Cal، أو خطاب مزايا من المقاطعة، أو الإقرار الضريبي الفيدرالي للعام الماضي",
+        "إثبات الإقامة في San Francisco لبرامج المقيمين",
+        "بطاقة Clipper Access للتقدّم بطلب للحصول على Free Muni for People with Disabilities",
+      ],
+      steps: [
+        { title: "احصل على بطاقة Clipper", desc: "تعمل Clipper على Muni وعلى كل أنظمة النقل الأخرى في Bay Area. احصل على بطاقة فعلية عبر الإنترنت، أو قم بإعداد Clipper على هاتفك. سجّل بطاقتك بعد الحصول عليها، وأعِد شحن الرصيد عبر الإنترنت متى احتجت إلى ذلك." },
+        { title: "اختر طريقة الدفع", desc: "المس بطاقة Clipper، أو اشترِ الأجرة عبر تطبيق MuniMobile وفعّل تذكرتك عند الصعود، أو ادفع نقدًا بالمبلغ المضبوط تمامًا (تُصدر آلات بيع التذاكر قسائم وليس فكة نقدية)، أو المس بطاقة مصرفية لا تلامسية." },
+        { title: "احتفظ بإثبات الدفع", desc: "بعد دفع الأجرة، احتفظ بإثبات الدفع معك طوال الرحلة." },
+        { title: "تحقّق مما إذا كنت مؤهلاً للحصول على تخفيض", desc: "يركب الشباب من عمر 18 عامًا فأقل مجانًا دون تقديم طلب. وقد يكون كبار السن من عمر 65+ والأشخاص ذوو الإعاقات المؤهِّلة مؤهلين للحصول على Free Muni. وقد يكون البالغون من ذوي الدخل المحدود الذين تتراوح أعمارهم بين 19-64 عامًا مؤهلين للحصول على Clipper START، الذي يسري أيضًا عبر وسائل النقل الأخرى في Bay Area." },
+        { title: "تقدّم بطلب لبرنامج التخفيض الخاص بك", desc: "تقدّم بالطلب عبر الإنترنت — Clipper START عبر clipperstartcard.com، وبرنامجا Free Muni لكبار السن وذوي الإعاقة عبر طلب SFMTA. يمكنك أيضًا التقدّم بطلب ورقي في مركز خدمة العملاء SFMTA Customer Service Center، 11 South Van Ness Avenue. تحقّق من الصفحة الرسمية لمعرفة المبالغ الحالية وحدود الدخل وأوقات المعالجة قبل التقديم." },
+      ],
+      officialLabel: "اطّلع على الأجرة وبرامج التخفيض على SFMTA.com",
+      phoneLabel: "معلومات أجرة وخدمات Muni من SFMTA",
     },
   },
 };

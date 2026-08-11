@@ -93,7 +93,6 @@ const STATUS_COLOR = { open: C.open, inProgress: C.progress, closed: C.closed };
 /* ---------- Official service destinations ---------- */
 const LINKS = {
   s1: "https://www.sf311.org",
-  s2: "https://www.sfmta.com",
   s3: "https://www.getcalfresh.org",
   s4: "https://housing.sfgov.org",
   s5: "https://www.sfmta.com/getting-around/accessibility/shop-round",
@@ -272,7 +271,7 @@ function DistrictView({ district, lang, setLang }) {
           <SectionLabel>{t.servicesLabel}</SectionLabel>
           <div style={{ borderTop: `1px solid ${C.hairline}` }}>
             <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} to={"/district/" + d + "/report"} />
-            <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} href={LINKS.s2} />
+            <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} to="/apply/transit" />
             <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} to="/apply/food" />
             <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} to="/apply/housing" />
             <ServiceRow title={t.sHealth} desc={t.sHealthd} rtl={rtl} to="/apply/health" />
