@@ -95,8 +95,6 @@ const LINKS = {
   s1: "https://www.sf311.org",
   s3: "https://www.getcalfresh.org",
   s4: "https://housing.sfgov.org",
-  s5: "https://www.sfmta.com/getting-around/accessibility/shop-round",
-  s6: "https://www.sfmta.com/getting-around/accessibility/paratransit/essential-trip-card",
   s7: "https://btwcsc.org/programs/",
 };
 
@@ -277,8 +275,7 @@ function DistrictView({ district, lang, setLang }) {
             <ServiceRow title={t.sHealth} desc={t.sHealthd} rtl={rtl} to="/apply/health" />
             {featured && (
               <>
-                <ServiceRow title={t.s5} desc={t.s5d} rtl={rtl} href={LINKS.s5} />
-                <ServiceRow title={t.s6} desc={t.s6d} rtl={rtl} href={LINKS.s6} />
+                <ServiceRow title={t.s5} desc={t.s5d} rtl={rtl} to="/apply/paratransit" />
                 <ServiceRow title={t.s7} desc={t.s7d} rtl={rtl} href={LINKS.s7} />
               </>
             )}

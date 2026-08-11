@@ -196,6 +196,54 @@ export const PROGRAMS = [
     phoneLabel: "SFMTA Muni fares & service info",
     phone: "311 (Outside SF: 415-701-2311)", // 311 / SFMTA contact shown on the fares hub, verified 2026-08-10
   },
+  // ---- Paratransit / accessibility guide (Phase 4b): all facts verified 2026-08-10
+  // against official sources, adversarially re-checked before shipping. Fares and
+  // subsidy dollar amounts are intentionally NOT stated here — they change over
+  // time; residents follow officialHref for current figures.
+  //   Shop-a-Round:      https://www.sfmta.com/getting-around/accessibility/shop-round
+  //   Essential Trip Card: https://www.sfmta.com/getting-around/accessibility/paratransit/essential-trip-card
+  {
+    slug: "paratransit",
+    navLabel: "Accessibility & Paratransit Rides",
+    navDesc: "Grocery shuttle and discounted taxi rides for seniors and people with disabilities",
+    title: "Getting Accessible Rides: Shop-a-Round & Essential Trip Card",
+    intro:
+      "SFMTA offers two rider-assistance programs alongside regular Muni and ADA Paratransit service. Shop-a-Round is a shuttle that takes registered riders to grocery stores and supermarkets in San Francisco. The Essential Trip Card discounts taxi fares for essential trips — grocery shopping, pharmacy visits, and medical appointments — within San Francisco. The Essential Trip Card began during the COVID-19 pandemic and remains available until further notice.",
+    eligibilityNote:
+      "Before You Start: Shop-a-Round registration is open to riders who are age 65 or older, hold a Clipper Access (formerly RTC) Discount ID Card, or are eligible for ADA Paratransit services. The Essential Trip Card is open to applicants who are age 65 or older, have a disability, or have a health condition or mobility challenge that prevents them from using Muni or reaching nearby transit stops or stations. Each program has its own registration or enrollment process, so check the official pages for current details before you apply.",
+    documents: [
+      "Proof of age, if applying based on being 65 or older",
+      "Proof of disability or a qualifying health or mobility condition — such as a Clipper Access (RTC) Discount ID Card, ADA Paratransit eligibility, or documentation from a health provider",
+      "A current mailing address, since the Shop-a-Round shuttle schedule is mailed to registered riders rather than posted publicly",
+      "Photo ID, if enrolling for the Essential Trip Card in person",
+    ],
+    steps: [
+      {
+        title: "Learn about Shop-a-Round",
+        desc: "This shuttle takes registered riders to grocery stores and supermarkets in San Francisco. You'll typically spend about an hour at the store per stop, and registered riders may take unlimited rides. Shuttle schedules vary by site and are mailed to riders after they register.",
+      },
+      {
+        title: "Register for Shop-a-Round",
+        desc: "Contact the Mobility Management Center to register if you're 65 or older, hold a Clipper Access Discount ID Card, or qualify for ADA Paratransit services. Current fares and schedule information are provided when you register.",
+      },
+      {
+        title: "Learn about the Essential Trip Card",
+        desc: "This program discounts taxi fares for essential trips — grocery shopping, pharmacy visits, and medical appointments — within San Francisco. Eligible riders load value onto a card and pay a reduced share of the regular cab fare; check the official page for current subsidy amounts.",
+      },
+      {
+        title: "Enroll for the Essential Trip Card",
+        desc: "Enroll in person at the SF Paratransit Broker's Office, 68 12th Street, First Floor, San Francisco, or call the enrollment line during weekday business hours to ask about your options.",
+      },
+      {
+        title: "Confirm current fares and loading amounts",
+        desc: "Costs for both programs can change over time. Check the official SFMTA pages linked below for the current Shop-a-Round one-way fare and Essential Trip Card loading amounts before you plan your trips.",
+      },
+    ],
+    officialHref: "https://www.sfmta.com/getting-around/accessibility",
+    officialLabel: "See accessibility & paratransit programs at SFMTA.com",
+    phoneLabel: "SF Paratransit Mobility Management Center (Essential Trip Card enrollment line: 415-351-7053, weekdays 9:00 AM-4:45 PM)",
+    phone: "415-351-7000", // confirmed on sfmta.com Shop-a-Round & Essential Trip Card pages, 2026-08-10
+  },
 ];
 
 /**
@@ -305,6 +353,30 @@ export const PROGRAM_T = {
       officialLabel: "Consulte las tarifas y los programas de descuento en SFMTA.com",
       phoneLabel: "Información de tarifas y servicio de Muni de SFMTA",
     },
+    paratransit: {
+      navLabel: "Transporte Accesible y Paratránsito",
+      navDesc: "Transporte a supermercados y tarifas de taxi con descuento para personas mayores y personas con discapacidad",
+      title: "Cómo obtener transporte accesible: Shop-a-Round y Essential Trip Card",
+      intro:
+        "SFMTA ofrece dos programas de asistencia al pasajero además del servicio regular de Muni y ADA Paratransit. Shop-a-Round es un transporte que lleva a los pasajeros inscritos a tiendas de comestibles y supermercados en San Francisco. Essential Trip Card ofrece descuentos en tarifas de taxi para viajes esenciales — ir de compras, visitar la farmacia y acudir a citas médicas — dentro de San Francisco. Essential Trip Card comenzó durante la pandemia de COVID-19 y sigue disponible hasta nuevo aviso.",
+      eligibilityNote:
+        "Antes de comenzar: la inscripción en Shop-a-Round está abierta a pasajeros que tengan 65 años o más, que tengan una tarjeta de descuento Clipper Access (antes RTC), o que sean elegibles para los servicios de ADA Paratransit. Essential Trip Card está abierto a solicitantes que tengan 65 años o más, que tengan una discapacidad, o que tengan una condición de salud o una limitación de movilidad que les impida usar Muni o llegar a las paradas o estaciones de transporte cercanas. Cada programa tiene su propio proceso de registro o inscripción, así que consulte las páginas oficiales para conocer los detalles actuales antes de solicitar.",
+      documents: [
+        "Comprobante de edad, si solicita por tener 65 años o más",
+        "Comprobante de discapacidad o de una condición de salud o movilidad que califique — como una tarjeta de descuento Clipper Access (RTC), elegibilidad para ADA Paratransit, o documentación de un proveedor de salud",
+        "Un domicilio postal vigente, ya que el horario del transporte Shop-a-Round se envía por correo a los pasajeros inscritos en lugar de publicarse públicamente",
+        "Identificación con foto, si se inscribe para Essential Trip Card en persona",
+      ],
+      steps: [
+        { title: "Conozca Shop-a-Round", desc: "Este transporte lleva a los pasajeros inscritos a tiendas de comestibles y supermercados en San Francisco. Por lo general, pasará aproximadamente una hora en la tienda por parada, y los pasajeros inscritos pueden tomar viajes ilimitados. Los horarios del transporte varían según el lugar y se envían por correo a los pasajeros después de inscribirse." },
+        { title: "Inscríbase en Shop-a-Round", desc: "Comuníquese con el Mobility Management Center para inscribirse si tiene 65 años o más, tiene una tarjeta de descuento Clipper Access, o califica para los servicios de ADA Paratransit. La información actual sobre tarifas y horarios se proporciona al momento de inscribirse." },
+        { title: "Conozca Essential Trip Card", desc: "Este programa ofrece descuentos en tarifas de taxi para viajes esenciales — ir de compras, visitar la farmacia y acudir a citas médicas — dentro de San Francisco. Los pasajeros elegibles cargan saldo en una tarjeta y pagan una parte reducida de la tarifa regular del taxi; consulte la página oficial para conocer los montos actuales del subsidio." },
+        { title: "Inscríbase para Essential Trip Card", desc: "Inscríbase en persona en la Oficina del SF Paratransit Broker, 68 12th Street, First Floor, San Francisco, o llame a la línea de inscripción durante el horario laboral entre semana para preguntar sobre sus opciones." },
+        { title: "Confirme las tarifas y montos de carga actuales", desc: "Los costos de ambos programas pueden cambiar con el tiempo. Consulte las páginas oficiales de SFMTA enlazadas a continuación para conocer la tarifa actual de un solo viaje de Shop-a-Round y los montos de carga de Essential Trip Card antes de planear sus viajes." },
+      ],
+      officialLabel: "Vea los programas de accesibilidad y paratránsito en SFMTA.com",
+      phoneLabel: "Mobility Management Center de SF Paratransit (línea de inscripción de Essential Trip Card: 415-351-7053, entre semana de 9:00 a.m. a 4:45 p.m.)",
+    },
   },
   zh: {
     food: {
@@ -404,6 +476,30 @@ export const PROGRAM_T = {
       ],
       officialLabel: "在 SFMTA.com 查看車費與優惠計劃",
       phoneLabel: "SFMTA Muni 車費與服務資訊",
+    },
+    paratransit: {
+      navLabel: "無障礙與復康巴士服務",
+      navDesc: "為長者及身心障礙人士提供的雜貨接駁專車與計程車優惠服務",
+      title: "取得無障礙交通服務：Shop-a-Round 與 Essential Trip Card",
+      intro:
+        "除一般的 Muni 與 ADA Paratransit 服務外，SFMTA 也提供兩項乘客協助計畫。Shop-a-Round 是一項接駁專車服務，載送已登記的乘客前往 San Francisco 市內的雜貨店與超市。Essential Trip Card 則為 San Francisco 市內的必要出行——包括採買雜貨、前往藥局及就醫——提供計程車車資優惠。Essential Trip Card 是在 COVID-19 疫情期間推出的，目前仍持續提供，直至另行通知為止。",
+      eligibilityNote:
+        "開始之前：凡年滿 65 歲、持有 Clipper Access（前身為 RTC）優惠身分證，或符合 ADA Paratransit 資格的乘客，均可登記 Shop-a-Round。Essential Trip Card 則開放給年滿 65 歲、患有身心障礙，或因健康狀況或行動不便而無法搭乘 Muni 或前往鄰近交通站點的申請人。兩項計畫各有其登記或申請流程，請於申請前查閱官方頁面以取得最新詳情。",
+      documents: [
+        "若以年滿 65 歲的資格申請，需提供年齡證明",
+        "身心障礙或符合資格之健康或行動不便狀況的證明——例如 Clipper Access（RTC）優惠身分證、ADA Paratransit 資格證明，或醫療服務提供者出具的相關文件",
+        "目前的通訊地址，因為 Shop-a-Round 接駁專車時刻表是郵寄給已登記乘客，而非公開張貼",
+        "若親自申請 Essential Trip Card，需提供附照片的身分證件",
+      ],
+      steps: [
+        { title: "了解 Shop-a-Round", desc: "這項接駁專車服務會載送已登記的乘客前往 San Francisco 市內的雜貨店與超市。每次停靠通常可在店內停留約一小時，已登記的乘客可不限次數搭乘。接駁時刻表依站點而異，會在乘客完成登記後郵寄給乘客。" },
+        { title: "登記 Shop-a-Round", desc: "若您年滿 65 歲、持有 Clipper Access 優惠身分證，或符合 ADA Paratransit 資格，請聯絡 Mobility Management Center 進行登記。登記時將提供目前的車資與時刻表資訊。" },
+        { title: "了解 Essential Trip Card", desc: "此計畫為 San Francisco 市內的必要出行——包括採買雜貨、前往藥局及就醫——提供計程車車資優惠。符合資格的乘客可在卡片內儲值，並僅需支付一般計程車車資中較低的部分；請查閱官方頁面以取得目前的補助金額。" },
+        { title: "申請 Essential Trip Card", desc: "可親自前往 SF Paratransit Broker's Office（地址：68 12th Street, First Floor, San Francisco）辦理申請，或於平日上班時間致電申請專線詢問相關選項。" },
+        { title: "確認目前的車資與儲值金額", desc: "兩項計畫的費用可能隨時間調整。規劃行程前，請查閱下方連結的官方 SFMTA 頁面，以取得目前 Shop-a-Round 單程車資及 Essential Trip Card 儲值金額的最新資訊。" },
+      ],
+      officialLabel: "在 SFMTA.com 查看無障礙與復康巴士計畫",
+      phoneLabel: "SF Paratransit Mobility Management Center（Essential Trip Card 申請專線：415-351-7053，平日上午 9:00 至下午 4:45）",
     },
   },
   vi: {
@@ -505,6 +601,30 @@ export const PROGRAM_T = {
       officialLabel: "Xem tiền vé & các chương trình giảm giá tại SFMTA.com",
       phoneLabel: "Thông tin tiền vé & dịch vụ Muni của SFMTA",
     },
+    paratransit: {
+      navLabel: "Đi lại tiếp cận & Paratransit",
+      navDesc: "Xe đưa đón đi chợ và taxi giảm giá dành cho người cao tuổi và người khuyết tật",
+      title: "Đi lại hỗ trợ tiếp cận: Shop-a-Round & Essential Trip Card",
+      intro:
+        "SFMTA cung cấp hai chương trình hỗ trợ hành khách bên cạnh dịch vụ Muni và ADA Paratransit thông thường. Shop-a-Round là xe đưa đón chở hành khách đã đăng ký đến các cửa hàng tạp hóa và siêu thị tại San Francisco. Essential Trip Card giảm giá cước taxi cho các chuyến đi thiết yếu — đi chợ, đến hiệu thuốc và khám bệnh — trong phạm vi San Francisco. Essential Trip Card ra đời trong đại dịch COVID-19 và vẫn tiếp tục cho đến khi có thông báo mới.",
+      eligibilityNote:
+        "Trước khi bắt đầu: Đăng ký Shop-a-Round dành cho hành khách từ 65 tuổi trở lên, có thẻ giảm giá Clipper Access (trước đây là RTC), hoặc đủ điều kiện sử dụng dịch vụ ADA Paratransit. Essential Trip Card dành cho người nộp đơn từ 65 tuổi trở lên, có khuyết tật, hoặc có tình trạng sức khỏe hay khó khăn về vận động khiến họ không thể sử dụng Muni hoặc đến các điểm/trạm giao thông gần đó. Mỗi chương trình có quy trình đăng ký hoặc ghi danh riêng, vì vậy hãy kiểm tra các trang chính thức để biết thông tin hiện hành trước khi nộp đơn.",
+      documents: [
+        "Bằng chứng về tuổi, nếu nộp đơn dựa trên việc từ 65 tuổi trở lên",
+        "Bằng chứng về khuyết tật hoặc tình trạng sức khỏe/vận động đủ điều kiện — chẳng hạn như thẻ giảm giá Clipper Access (RTC), đủ điều kiện ADA Paratransit, hoặc giấy tờ từ nhà cung cấp dịch vụ y tế",
+        "Địa chỉ nhận thư hiện tại, vì lịch trình xe đưa đón Shop-a-Round được gửi qua thư đến hành khách đã đăng ký chứ không được công bố công khai",
+        "Giấy tờ tùy thân có ảnh, nếu ghi danh Essential Trip Card trực tiếp",
+      ],
+      steps: [
+        { title: "Tìm hiểu về Shop-a-Round", desc: "Xe đưa đón này chở hành khách đã đăng ký đến các cửa hàng tạp hóa và siêu thị tại San Francisco. Bạn thường sẽ ở lại cửa hàng khoảng một giờ cho mỗi điểm dừng, và hành khách đã đăng ký có thể đi không giới hạn số chuyến. Lịch trình xe đưa đón khác nhau tùy theo địa điểm và được gửi qua thư đến hành khách sau khi họ đăng ký." },
+        { title: "Đăng ký Shop-a-Round", desc: "Liên hệ Mobility Management Center để đăng ký nếu bạn từ 65 tuổi trở lên, có thẻ giảm giá Clipper Access, hoặc đủ điều kiện sử dụng dịch vụ ADA Paratransit. Thông tin về giá vé và lịch trình hiện hành sẽ được cung cấp khi bạn đăng ký." },
+        { title: "Tìm hiểu về Essential Trip Card", desc: "Chương trình này giảm giá cước taxi cho các chuyến đi thiết yếu — đi chợ, đến hiệu thuốc và khám bệnh — trong phạm vi San Francisco. Hành khách đủ điều kiện nạp tiền vào thẻ và chỉ trả một phần cước taxi thông thường; hãy kiểm tra trang chính thức để biết mức trợ cấp hiện hành." },
+        { title: "Ghi danh Essential Trip Card", desc: "Ghi danh trực tiếp tại SF Paratransit Broker's Office, 68 12th Street, First Floor, San Francisco, hoặc gọi đường dây ghi danh trong giờ làm việc các ngày trong tuần để hỏi về các lựa chọn của bạn." },
+        { title: "Xác nhận giá vé và mức nạp tiền hiện hành", desc: "Chi phí của cả hai chương trình có thể thay đổi theo thời gian. Hãy kiểm tra các trang chính thức của SFMTA được liên kết bên dưới để biết giá vé một chiều hiện hành của Shop-a-Round và mức nạp tiền của Essential Trip Card trước khi lên kế hoạch cho chuyến đi." },
+      ],
+      officialLabel: "Xem các chương trình tiếp cận & paratransit tại SFMTA.com",
+      phoneLabel: "SF Paratransit Mobility Management Center (đường dây ghi danh Essential Trip Card: 415-351-7053, các ngày trong tuần 9:00 AM-4:45 PM)",
+    },
   },
   ar: {
     food: {
@@ -604,6 +724,30 @@ export const PROGRAM_T = {
       ],
       officialLabel: "اطّلع على الأجرة وبرامج التخفيض على SFMTA.com",
       phoneLabel: "معلومات أجرة وخدمات Muni من SFMTA",
+    },
+    paratransit: {
+      navLabel: "رحلات إمكانية الوصول والنقل التكميلي",
+      navDesc: "حافلة تسوق للبقالة ورحلات تاكسي مخفضة لكبار السن والأشخاص ذوي الإعاقة",
+      title: "الحصول على رحلات ميسّرة: Shop-a-Round وEssential Trip Card",
+      intro:
+        "تقدّم SFMTA برنامجين لمساعدة الركاب إلى جانب خدمة Muni وADA Paratransit العادية. برنامج Shop-a-Round هو حافلة تنقل الركاب المسجَّلين إلى متاجر البقالة والسوبرماركت في San Francisco. أما بطاقة Essential Trip Card فتخفّض أجرة سيارات الأجرة (التاكسي) للرحلات الأساسية — التسوق لشراء البقالة، وزيارات الصيدلية، والمواعيد الطبية — داخل San Francisco. بدأ برنامج Essential Trip Card خلال جائحة COVID-19 ولا يزال متاحًا حتى إشعار آخر.",
+      eligibilityNote:
+        "قبل أن تبدأ: التسجيل في Shop-a-Round متاح للركاب البالغين من العمر 65 عامًا فأكثر، أو الحاصلين على بطاقة هوية الخصم Clipper Access (المعروفة سابقًا باسم RTC)، أو المؤهلين للحصول على خدمات ADA Paratransit. أما بطاقة Essential Trip Card فمتاحة للمتقدمين البالغين من العمر 65 عامًا فأكثر، أو الذين لديهم إعاقة، أو الذين يعانون من حالة صحية أو صعوبة في التنقل تمنعهم من استخدام Muni أو الوصول إلى محطات أو مواقف النقل القريبة. لكل برنامج عملية تسجيل أو التحاق خاصة به، لذا يُرجى مراجعة الصفحات الرسمية للاطلاع على أحدث التفاصيل قبل التقديم.",
+      documents: [
+        "إثبات العمر، في حال التقديم استنادًا إلى بلوغ سن 65 عامًا أو أكثر",
+        "إثبات الإعاقة أو حالة صحية أو حالة تنقل مؤهِّلة — مثل بطاقة هوية الخصم Clipper Access (RTC)، أو أهلية ADA Paratransit، أو وثائق من مقدّم رعاية صحية",
+        "عنوان بريدي حالي، حيث يُرسَل جدول حافلة Shop-a-Round بالبريد إلى الركاب المسجَّلين بدلاً من نشره علنًا",
+        "بطاقة هوية تحمل صورة، في حال الالتحاق ببرنامج Essential Trip Card شخصيًا",
+      ],
+      steps: [
+        { title: "تعرّف على Shop-a-Round", desc: "تنقل هذه الحافلة الركاب المسجَّلين إلى متاجر البقالة والسوبرماركت في San Francisco. ستقضي عادةً نحو ساعة في المتجر لكل توقف، ويمكن للركاب المسجَّلين القيام برحلات غير محدودة. تختلف جداول الحافلة حسب الموقع وتُرسَل بالبريد إلى الركاب بعد التسجيل." },
+        { title: "سجّل في Shop-a-Round", desc: "تواصل مع Mobility Management Center للتسجيل إذا كنت تبلغ 65 عامًا أو أكثر، أو تحمل بطاقة هوية الخصم Clipper Access، أو تستوفي شروط خدمات ADA Paratransit. يتم تزويدك بمعلومات الأجرة والجدول الحالية عند التسجيل." },
+        { title: "تعرّف على Essential Trip Card", desc: "يخفّض هذا البرنامج أجرة سيارات الأجرة للرحلات الأساسية — التسوق لشراء البقالة، وزيارات الصيدلية، والمواعيد الطبية — داخل San Francisco. يقوم الركاب المؤهَّلون بتحميل رصيد على البطاقة ودفع حصة مخفَّضة من أجرة التاكسي العادية؛ يُرجى مراجعة الصفحة الرسمية للاطلاع على مبالغ الدعم الحالية." },
+        { title: "الالتحاق ببرنامج Essential Trip Card", desc: "يمكنك الالتحاق بالبرنامج شخصيًا في SF Paratransit Broker's Office، العنوان 68 12th Street، First Floor، San Francisco، أو الاتصال بخط الالتحاق خلال ساعات العمل أيام الأسبوع للاستفسار عن خياراتك." },
+        { title: "تأكد من الأجرة الحالية ومبالغ التحميل", desc: "قد تتغيّر تكاليف كلا البرنامجين بمرور الوقت. راجع صفحات SFMTA الرسمية المرتبطة أدناه للاطلاع على أجرة الاتجاه الواحد الحالية لبرنامج Shop-a-Round ومبالغ التحميل لبطاقة Essential Trip Card قبل التخطيط لرحلاتك." },
+      ],
+      officialLabel: "اطّلع على برامج إمكانية الوصول والنقل التكميلي على SFMTA.com",
+      phoneLabel: "SF Paratransit Mobility Management Center (خط الالتحاق ببطاقة Essential Trip Card: 415-351-7053، أيام الأسبوع من 9:00 صباحًا حتى 4:45 مساءً)",
     },
   },
 };
