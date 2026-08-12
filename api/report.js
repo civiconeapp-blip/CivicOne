@@ -156,6 +156,45 @@ async function classify(photoBase64, mediaType, note, lang) {
   }
 }
 
+// Ordered stages the resident sees while their report is being filed.
+const STEP_ORDER = ["analyzing", "location", "details", "contact", "submitting"];
+const TOTAL_STEPS = STEP_ORDER.length;
+const HEARTBEAT_MS = 5_000;
+
+// Newline-delimited JSON: one object per line, flushed as it happens.
+// Heartbeats keep intermediaries and mobile radios from treating a long
+// quiet stretch as a dead connection.
+function startStream(res) {
+  res.writeHead(200, {
+    "Content-Type": "application/x-ndjson; charset=utf-8",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+    "X-Accel-Buffering": "no",
+  });
+  res.flushHeaders?.();
+
+  const write = (obj) => {
+    try {
+      res.write(JSON.stringify(obj) + "\n");
+    } catch (_) {
+      // Resident hung up; the filing continues regardless.
+    }
+  };
+  write({ type: "start" });
+
+  const beat = setInterval(() => write({ type: "ping" }), HEARTBEAT_MS);
+  if (typeof beat.unref === "function") beat.unref();
+
+  return {
+    send: write,
+    finish(payload) {
+      clearInterval(beat);
+      write({ type: "result", ...payload });
+      res.end();
+    },
+  };
+}
+
 export default async function handler(req, res) {
   // Health check.
   if (req.method === "GET") {
@@ -186,9 +225,18 @@ export default async function handler(req, res) {
     const address = manualAddress || (await reverseGeocode(lat, lng));
     if (!address) return res.status(422).json({ error: "Could not resolve address from GPS" });
 
+    // Everything past this point takes over a minute (AI + a five-page
+    // browser walk on SF311's site). A phone will not hold a silent request
+    // open that long — it aborts, the resident sees "Load failed", and the
+    // report gets filed anyway with nobody to receive the case number. So
+    // stream from here: progress lines keep the connection alive and tell
+    // the resident what's happening, and the final line carries the result.
+    const stream = startStream(res);
+
+    stream.send({ type: "progress", step: "analyzing", n: 1, total: TOTAL_STEPS });
     const ai = await classify(photo, mediaType || "image/jpeg", note, lang);
     if (ai.emergency) {
-      return res.status(200).json({ ok: true, emergency: true, summary_local: ai.summary_local });
+      return stream.finish({ ok: true, emergency: true, summary_local: ai.summary_local });
     }
 
     const photoPath = path.join(os.tmpdir(), `report_${Date.now()}.jpg`);
@@ -205,13 +253,21 @@ export default async function handler(req, res) {
       photoPath,
       email: (typeof email === "string" && email.includes("@") ? email.trim() : "") || process.env.REPORTER_EMAIL,
       dryRun: Boolean(process.env.DRY_RUN),
+      onProgress: (step) => {
+        const n = STEP_ORDER.indexOf(step);
+        if (n >= 0) stream.send({ type: "progress", step, n: n + 1, total: TOTAL_STEPS });
+      },
     });
 
     fs.unlink(photoPath, () => {});
-    if (!result.ok) {
+    if (result.ok) {
+      // Logged so a filed report is still traceable when the resident's
+      // connection dropped before the case number reached them.
+      console.log("Report filed:", { caseNumber: result.caseNumber, dryRun: result.dryRun, address });
+    } else {
       console.error("Report failure (unfiled):", { step: result.step, error: result.error, form: ai.form, category: ai.category });
     }
-    return res.status(result.ok ? 200 : 502).json({
+    return stream.finish({
       address,
       category: ai.category,
       summary_local: ai.summary_local,
@@ -220,6 +276,14 @@ export default async function handler(req, res) {
     });
   } catch (err) {
     console.error("Report failure", err);
+    if (res.headersSent) {
+      // Mid-stream: the status line is long gone, so the error has to ride
+      // in the payload. The client branches on ok, not on HTTP status.
+      try {
+        res.write(JSON.stringify({ type: "result", ok: false, error: err.message || "Something went wrong." }) + "\n");
+      } catch (_) {}
+      return res.end();
+    }
     return res.status(500).json({ error: err.message || "Something went wrong." });
   }
 }

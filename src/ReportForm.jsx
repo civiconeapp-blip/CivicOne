@@ -22,6 +22,46 @@ const caps = {
 
 const SF311_FALLBACK = "https://sf.gov/topics--311-online-services/";
 
+/* Filing takes over a minute, so /api/report streams newline-delimited JSON:
+   progress lines while it works, then one final "result" line. Reading it as
+   a stream (rather than awaiting the whole body) is what lets us show the
+   resident real progress instead of a silent wait they assume has died.
+   Falls back to plain JSON so an older/other response still parses. */
+async function readReport(response, onStep) {
+  const isStream = (response.headers.get("content-type") || "").includes("ndjson");
+  if (!isStream || !response.body || !response.body.getReader) {
+    return response.json();
+  }
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let final = null;
+
+  const handle = (line) => {
+    const text = line.trim();
+    if (!text) return;
+    let msg;
+    try {
+      msg = JSON.parse(text);
+    } catch {
+      return; // ignore a partial or malformed line rather than failing the filing
+    }
+    if (msg.type === "progress") onStep({ n: msg.n, total: msg.total });
+    else if (msg.type === "result") final = msg;
+  };
+
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+    lines.forEach(handle);
+  }
+  handle(buffer);
+  return final;
+}
+
 /* One-tap 311: photo + GPS -> AI writes the report -> CivicOne's backend
    drives SF311's official web form and returns the real SR case number.
    Filing is anonymous; nothing is stored. */
@@ -34,6 +74,8 @@ export default function ReportForm({ t, lang }) {
   const [errMsg, setErrMsg] = useState("");
   const [addr, setAddr] = useState("");
   const [locError, setLocError] = useState(null); // null | "denied" | "unavailable" | "unsupported"
+  const [step, setStep] = useState(null); // {n, total} while filing
+  const [maybeFiled, setMaybeFiled] = useState(false); // connection died mid-filing
   const pendingPhoto = useRef(null);
   const coordsPromiseRef = useRef(null);
 
@@ -156,6 +198,8 @@ export default function ReportForm({ t, lang }) {
 
   async function file(coords, manualAddress) {
     setPhase("filing");
+    setStep(null);
+    setMaybeFiled(false);
     try {
       const b64 = await compress(pendingPhoto.current);
       const r = await fetch("/api/report", {
@@ -172,7 +216,15 @@ export default function ReportForm({ t, lang }) {
           lang,
         }),
       });
-      const j = await r.json();
+      const j = await readReport(r, setStep);
+      if (!j) {
+        // The stream ended without a result line: the filing was still
+        // running when the connection died, so SF311 may well have accepted
+        // it. Saying "it failed" here is what gets duplicate cases filed.
+        setMaybeFiled(true);
+        setPhase("failed");
+        return;
+      }
       if (j.emergency) {
         setResult(j);
         setPhase("emergency");
@@ -272,7 +324,9 @@ export default function ReportForm({ t, lang }) {
         {phase === "locating"
           ? t.rGettingLoc
           : phase === "filing"
-          ? t.rFiling
+          ? step
+            ? `${t.rFiling} (${step.n}/${step.total})`
+            : t.rFiling
           : t.rSnap}
       </button>
 
@@ -396,7 +450,7 @@ export default function ReportForm({ t, lang }) {
       {phase === "failed" && (
         <div style={{ marginTop: 28, border: `1px solid ${C.alert}`, background: "#FFFFFF", padding: 18 }}>
           <p style={{ ...sans, fontSize: 13.5, color: C.ink, margin: 0, lineHeight: 1.6 }}>
-            {t.rFailNote}
+            {maybeFiled ? t.rMaybeFiled : t.rFailNote}
           </p>
           {errMsg ? (
             <p style={{ ...mono, fontSize: 11, color: C.muted, margin: "10px 0 0" }}>{errMsg}</p>
