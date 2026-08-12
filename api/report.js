@@ -208,6 +208,9 @@ export default async function handler(req, res) {
     });
 
     fs.unlink(photoPath, () => {});
+    if (!result.ok) {
+      console.error("Report failure (unfiled):", { step: result.step, error: result.error, form: ai.form, category: ai.category });
+    }
     return res.status(result.ok ? 200 : 502).json({
       address,
       category: ai.category,
