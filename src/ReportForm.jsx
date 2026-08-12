@@ -228,7 +228,11 @@ export default function ReportForm({ t, lang }) {
       if (j.emergency) {
         setResult(j);
         setPhase("emergency");
-      } else if (j.ok && (j.caseNumber || j.dryRun)) {
+      } else if (j.ok) {
+        // Success is ok:true — NOT the presence of a case number. A real
+        // filing came back with an unparsed number and this branch used to
+        // fall through to "didn't work", which sent the resident off to
+        // file the same thing again.
         setResult(j);
         setPhase("done");
         if (window.umami)
@@ -420,13 +424,17 @@ export default function ReportForm({ t, lang }) {
       {phase === "done" && result && (
         <div style={{ marginTop: 28, border: `1px solid ${C.hairline}`, background: "#FFFFFF", padding: "20px 18px" }}>
           <div style={{ ...caps, fontSize: 10, color: C.gold }}>{t.rFiledTitle}</div>
-          {result.caseNumber && (
+          {result.caseNumber ? (
             <div style={{ marginTop: 14 }}>
               <span style={{ ...caps, fontSize: 10, color: C.muted }}>{t.rCaseNo}</span>
               <div style={{ ...mono, fontSize: 22, color: C.ink, marginTop: 4 }}>
                 #{result.caseNumber}
               </div>
             </div>
+          ) : (
+            <p style={{ ...sans, fontSize: 13, color: C.ink, margin: "14px 0 0", lineHeight: 1.5 }}>
+              {t.rNoCaseNo}
+            </p>
           )}
           {result.summary_local && (
             <p dir="auto" style={{ ...serif, fontSize: 15.5, color: C.ink, margin: "14px 0 0", lineHeight: 1.6 }}>
