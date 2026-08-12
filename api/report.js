@@ -1,11 +1,15 @@
 // api/report.js — CivicOne one-tap 311 filing.
 // Photo + GPS in → Gemini identifies the problem and writes the report →
-// a headless browser drives SF311's official web form → the real SR case
-// number comes back. Uses the same GEMINI_API_KEY as api/triage.js.
+// a hosted headless browser drives SF311's official web form → the real SR
+// case number comes back. Uses the same GEMINI_API_KEY as api/triage.js.
 //
-// Extra env (optional): REPORTER_EMAIL — some SF311 forms require an email
-// even for anonymous reports (street cleaning). Without it those categories
-// fall back to an error the UI handles gracefully.
+// Robustness: the AI step has a hard time limit and a keyword fallback, so a
+// slow or unreadable AI response never hangs or kills the report — it still
+// files with a sensible category built from the resident's note.
+//
+// Extra env (optional): REPORTER_EMAIL — fallback email; some SF311 forms
+// require one even for anonymous reports (street cleaning). A resident's own
+// email from the form takes priority so 311 sends case updates to them.
 // Privacy: photo goes to the AI and to SF311's form, nothing is stored.
 
 import fs from "fs";
@@ -15,6 +19,7 @@ import { submitReport } from "../lib/submit311.js";
 import { forms } from "../lib/forms311.js";
 
 const MODEL = "gemini-3.5-flash";
+const AI_TIMEOUT_MS = 15_000;
 
 const GEOCODE =
   "https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode";
@@ -49,58 +54,106 @@ Respond with ONLY compact JSON, exactly these keys:
 emergency (boolean), form (string), category (string), description (string),
 locationDescription (string), summary_local (string).`;
 
-async function classify(photoBase64, mediaType, note, lang) {
-  const r = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { inlineData: { mimeType: mediaType, data: photoBase64 } },
-              {
-                text:
-                  `Resident language code: ${lang || "en"}.` +
-                  (note ? `\nResident note: ${note}` : "\nNo note provided."),
-              },
-            ],
-          },
-        ],
-        generationConfig: {
-          responseMimeType: "application/json",
-          temperature: 0.2,
-          maxOutputTokens: 4096,
-        },
-      }),
-    }
+// Keyword fallback so a failed/slow AI never blocks a report.
+function heuristicClassify(note) {
+  const n = (note || "").toLowerCase();
+  const pick = (form, category, description) => ({
+    emergency: false,
+    form,
+    category,
+    description,
+    locationDescription: "",
+    summary_local: note ? `Reporting: ${note}` : "Reporting a street issue at this location.",
+  });
+  if (/(tent|encampment|homeless|unhoused)/.test(n))
+    return pick("blocked_street_sidewalk", "encampment", note || "Encampment on the sidewalk.");
+  if (/(needle|syringe)/.test(n))
+    return pick("street_cleaning", "needles_less_than_20", note || "Needles on public property.");
+  if (/(mattress)/.test(n))
+    return pick("street_cleaning", "mattress", note || "Discarded mattress.");
+  if (/(feces|poop|urine|human waste|bodily)/.test(n))
+    return pick("street_cleaning", "human_waste_or_urine", note || "Human or animal waste.");
+  if (/(couch|sofa|furniture|chair|table)/.test(n))
+    return pick("street_cleaning", "furniture", note || "Discarded furniture.");
+  if (/(cart|shopping cart)/.test(n))
+    return pick("street_cleaning", "shopping_cart", note || "Abandoned shopping cart.");
+  if (/(fridge|refrigerator|appliance|washer|dryer)/.test(n))
+    return pick("street_cleaning", "refrigerator_appliance", note || "Discarded appliance.");
+  if (/(sidewalk block|blocking sidewalk|blocked sidewalk)/.test(n))
+    return pick("blocked_street_sidewalk", "blocked_sidewalk", note || "Blocked sidewalk.");
+  // Default: general loose garbage / debris (covers "trash", "garbage", "dumping", etc.)
+  return pick(
+    "street_cleaning",
+    "other_loose_garbage_debris_yard_waste",
+    note || "Loose garbage or debris on the sidewalk."
   );
-  if (!r.ok) throw new Error(`AI classify failed: ${r.status}`);
-  const data = await r.json();
-  const parts = data?.candidates?.[0]?.content?.parts || [];
-  const raw = parts.filter((p) => p.text && !p.thought).map((p) => p.text).join("");
-  let out = null;
-  const start = raw.indexOf("{");
-  let end = raw.lastIndexOf("}");
-  while (start >= 0 && end > start && !out) {
-    try { out = JSON.parse(raw.slice(start, end + 1)); }
-    catch { end = raw.lastIndexOf("}", end - 1); }
-  }
-  if (!out) throw new Error("AI gave an unreadable answer");
+}
 
-  // Guardrails: never trust the model blindly.
-  out.emergency = Boolean(out.emergency);
-  if (!forms[out.form]) out.form = "street_cleaning";
-  if (!forms[out.form].categories[out.category]) {
-    out.category =
-      out.form === "street_cleaning"
-        ? "other_loose_garbage_debris_yard_waste"
-        : "blocked_sidewalk";
+async function classify(photoBase64, mediaType, note, lang) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+  try {
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { inlineData: { mimeType: mediaType, data: photoBase64 } },
+                {
+                  text:
+                    `Resident language code: ${lang || "en"}.` +
+                    (note ? `\nResident note: ${note}` : "\nNo note provided."),
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
+            temperature: 0.2,
+            maxOutputTokens: 800,
+          },
+        }),
+      }
+    );
+    if (!r.ok) throw new Error(`AI classify failed: ${r.status}`);
+    const data = await r.json();
+    const parts = data?.candidates?.[0]?.content?.parts || [];
+    const raw = parts.filter((p) => p.text && !p.thought).map((p) => p.text).join("");
+    let out = null;
+    const start = raw.indexOf("{");
+    let end = raw.lastIndexOf("}");
+    while (start >= 0 && end > start && !out) {
+      try { out = JSON.parse(raw.slice(start, end + 1)); }
+      catch { end = raw.lastIndexOf("}", end - 1); }
+    }
+    if (!out) throw new Error("unreadable");
+
+    out.emergency = Boolean(out.emergency);
+    if (out.emergency) return out;
+    if (!forms[out.form]) out.form = "street_cleaning";
+    if (!forms[out.form].categories[out.category]) {
+      out.category =
+        out.form === "street_cleaning"
+          ? "other_loose_garbage_debris_yard_waste"
+          : "blocked_sidewalk";
+    }
+    if (!out.description) out.description = note || "Street issue at this location.";
+    if (typeof out.locationDescription !== "string") out.locationDescription = "";
+    return out;
+  } catch (e) {
+    // AI failed, was blocked, or timed out — fall back to the keyword heuristic.
+    console.warn("AI classify fell back to heuristic:", e && e.message);
+    return heuristicClassify(note);
+  } finally {
+    clearTimeout(timer);
   }
-  return out;
 }
 
 export default async function handler(req, res) {
@@ -110,6 +163,10 @@ export default async function handler(req, res) {
       ok: true,
       hasKey: Boolean(process.env.GEMINI_API_KEY),
       hasEmail: Boolean(process.env.REPORTER_EMAIL),
+      hasBrowser: Boolean(
+        (process.env.BROWSERBASE_API_KEY && process.env.BROWSERBASE_PROJECT_ID) ||
+          process.env.BROWSERLESS_WS
+      ),
       dryRun: Boolean(process.env.DRY_RUN),
     });
   }
@@ -119,7 +176,7 @@ export default async function handler(req, res) {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({ error: "Server is not configured yet." });
     }
-    const { photo, mediaType, lat, lng, note, lang, address: manualAddress } = req.body || {};
+    const { photo, mediaType, lat, lng, note, lang, email, address: manualAddress } = req.body || {};
     if (!photo) return res.status(400).json({ error: "photo (base64) required" });
     if (photo.length > 8_000_000) return res.status(413).json({ error: "Photo too large" });
     if (!manualAddress && (lat == null || lng == null)) {
@@ -142,9 +199,11 @@ export default async function handler(req, res) {
       category: ai.category,
       address,
       locationDescription: ai.locationDescription,
-      description: note ? `${ai.description} Reporter note: ${note}` : ai.description,
+      description:
+        (note ? `${ai.description} Reporter note: ${note}` : ai.description) +
+        "\n\nReported by CivicOne.",
       photoPath,
-      email: process.env.REPORTER_EMAIL,
+      email: (typeof email === "string" && email.includes("@") ? email.trim() : "") || process.env.REPORTER_EMAIL,
       dryRun: Boolean(process.env.DRY_RUN),
     });
 
