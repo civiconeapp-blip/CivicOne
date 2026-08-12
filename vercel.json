@@ -2,7 +2,7 @@
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "functions": {
     "api/report.js": {
-      "maxDuration": 60,
+      "maxDuration": 300,
       "memory": 1024
     }
   }
