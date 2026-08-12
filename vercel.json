@@ -1,14 +1,9 @@
 {
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "functions": {
     "api/report.js": {
       "maxDuration": 60,
-      "memory": 1769
+      "memory": 1024
     }
   }
 }
