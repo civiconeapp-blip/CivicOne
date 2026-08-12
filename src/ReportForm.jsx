@@ -112,6 +112,20 @@ export default function ReportForm({ t, lang }) {
     file(coords, null);
   }
 
+  // Lets a resident retry GPS from the manual-address fallback instead of
+  // being stuck typing — most "no location" cases are a missed permission
+  // prompt or a slow first fix, not a hard denial.
+  async function retryLocation() {
+    setPhase("locating");
+    requestLocation();
+    const coords = await coordsPromiseRef.current;
+    if (coords) {
+      file(coords, null);
+    } else {
+      setPhase("needAddress");
+    }
+  }
+
   async function file(coords, manualAddress) {
     setPhase("filing");
     try {
@@ -243,11 +257,33 @@ export default function ReportForm({ t, lang }) {
           <p style={{ ...sans, fontSize: 14, color: C.ink, margin: 0, lineHeight: 1.5 }}>
             {t.rNoLoc}
           </p>
+          <button
+            type="button"
+            onClick={retryLocation}
+            style={{
+              ...caps,
+              fontSize: 10.5,
+              marginTop: 12,
+              padding: "12px 18px",
+              background: "#FFFFFF",
+              color: C.navy,
+              border: `1px solid ${C.navy}`,
+              width: "100%",
+              cursor: "pointer",
+            }}
+          >
+            {t.rRetryLoc}
+          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
+            <div style={{ flex: 1, height: 1, background: C.hairline }} />
+            <span style={{ ...caps, fontSize: 9.5, color: C.muted }}>{t.rOr}</span>
+            <div style={{ flex: 1, height: 1, background: C.hairline }} />
+          </div>
           <input
             value={addr}
             onChange={(e) => setAddr(e.target.value)}
             placeholder={t.rAddrPlaceholder}
-            style={{ ...inputStyle, marginTop: 12 }}
+            style={inputStyle}
           />
           <button
             type="button"
@@ -275,7 +311,7 @@ export default function ReportForm({ t, lang }) {
           <p dir="auto" style={{ ...sans, fontSize: 16, fontWeight: 600, color: C.alert, margin: 0, lineHeight: 1.5 }}>
             {result.summary_local}
           </p>
-          
+          <a
             href="tel:911"
             style={{
               ...caps,
@@ -350,7 +386,7 @@ export default function ReportForm({ t, lang }) {
             >
               {t.rTryAgain}
             </button>
-            
+            <a
               href={SF311_FALLBACK}
               target="_blank"
               rel="noopener noreferrer"
