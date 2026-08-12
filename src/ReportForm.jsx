@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 /* Local design tokens (matches App.jsx "City Briefing" system) */
 const C = {
@@ -20,33 +20,27 @@ const caps = {
   fontWeight: 600,
 };
 
-/* Categories mapped to SF311's taxonomy. English always included so
-   SF311 staff can route regardless of the writer's language.
-   `url` is the real sf.gov page for that category, verified against the
-   live site — each one links onward to the actual SF311 submission form. */
-const CATS = [
-  { key: "rc1", en: "Street or Sidewalk Cleaning", url: "https://sf.gov/request-street-or-sidewalk-cleaning/" },
-  { key: "rc2", en: "Graffiti", url: "https://sf.gov/report-graffiti-issues/" },
-  { key: "rc3", en: "Pothole & Street Issues", url: "https://sf.gov/report-pothole-and-street-issues/" },
-  { key: "rc4", en: "Streetlight Repair", url: "https://sf.gov/report-problem-streetlight/" },
-  { key: "rc5", en: "Abandoned Vehicle", url: "https://sf.gov/report-abandoned-vehicle/" },
-  { key: "rc6", en: "Encampment", url: "https://sf.gov/report-homeless-encampments/" },
-  { key: "rc7", en: "General Request", url: "https://sf.gov/topics--311-online-services/" },
-];
-const EN_TO_KEY = Object.fromEntries(CATS.map((c) => [c.en, c.key]));
-const KEY_TO_URL = Object.fromEntries(CATS.map((c) => [c.key, c.url]));
-const GENERAL_URL = KEY_TO_URL.rc7;
+const SF311_FALLBACK = "https://sf.gov/topics--311-online-services/";
 
-export default function ReportForm({ t }) {
-  const [cat, setCat] = useState("");
-  const [loc, setLoc] = useState("");
-  const [desc, setDesc] = useState("");
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [ai, setAi] = useState(null); // AI triage result
-  const [manual, setManual] = useState(false); // fallback mode if AI is down
-  const [copied, setCopied] = useState(false);
+/* One-tap 311: photo + GPS -> AI writes the report -> CivicOne's backend
+   drives SF311's official web form and returns the real SR case number.
+   Filing is anonymous; nothing is stored. */
+export default function ReportForm({ t, lang }) {
+  const fileRef = useRef(null);
+  const [phase, setPhase] = useState("idle"); // idle | locating | filing | done | emergency | needAddress | failed
+  const [note, setNote] = useState("");
+  const [result, setResult] = useState(null);
+  const [errMsg, setErrMsg] = useState("");
+  const [addr, setAddr] = useState("");
+  const pendingPhoto = useRef(null);
 
+  const labelStyle = {
+    ...caps,
+    fontSize: 10,
+    color: C.muted,
+    display: "block",
+    margin: "20px 0 8px",
+  };
   const inputStyle = {
     ...sans,
     fontSize: 15,
@@ -60,92 +54,80 @@ export default function ReportForm({ t }) {
     appearance: "none",
     WebkitAppearance: "none",
   };
-  const labelStyle = {
-    ...caps,
-    fontSize: 10,
-    color: C.muted,
-    display: "block",
-    margin: "20px 0 8px",
-  };
 
-  const manualText = () => {
-    const c = CATS.find((x) => x.key === cat) || CATS[6];
-    const lines = ["SF311 Report", `Category: ${c.en}`];
-    if (loc.trim()) lines.push(`Location: ${loc.trim()}`);
-    lines.push(`Description: ${desc.trim()}`);
-    return lines.join("\n");
-  };
+  // Downscale so the upload stays small and fast.
+  async function compress(file, maxDim = 1568, quality = 0.8) {
+    const img = await createImageBitmap(file);
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.round(img.width * scale);
+    c.height = Math.round(img.height * scale);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL("image/jpeg", quality).split(",")[1];
+  }
 
-  const aiText = () => {
-    const lines = [
-      "SF311 Report",
-      `Category: ${ai.category}`,
-      `Severity: ${ai.severity}/3 — ${ai.severity_reason}`,
-    ];
-    if (loc.trim()) lines.push(`Location: ${loc.trim()}`);
-    lines.push(`Description: ${ai.description_en}`);
-    return lines.join("\n");
-  };
-
-  const reportText = () => (ai && !manual ? aiText() : manualText());
-
-  const prepare = async () => {
-    if (!desc.trim()) {
-      setError(true);
-      setAi(null);
-      setManual(false);
+  async function onPhoto(e) {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    pendingPhoto.current = f;
+    setResult(null);
+    setErrMsg("");
+    setPhase("locating");
+    let coords = null;
+    try {
+      const pos = await new Promise((res, rej) =>
+        navigator.geolocation.getCurrentPosition(res, rej, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+        })
+      );
+      coords = pos.coords;
+    } catch {
+      setPhase("needAddress");
       return;
     }
-    setError(false);
-    setCopied(false);
-    setAi(null);
-    setManual(false);
-    setLoading(true);
+    file(coords, null);
+  }
+
+  async function file(coords, manualAddress) {
+    setPhase("filing");
     try {
-      const r = await fetch("/api/triage", {
+      const b64 = await compress(pendingPhoto.current);
+      const r = await fetch("/api/report", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          description: desc.trim(),
-          location: loc.trim() || undefined,
+          photo: b64,
+          mediaType: "image/jpeg",
+          lat: coords ? coords.latitude : undefined,
+          lng: coords ? coords.longitude : undefined,
+          address: manualAddress || undefined,
+          note: note.trim() || undefined,
+          lang,
         }),
       });
-      if (!r.ok) throw new Error("triage " + r.status);
-      const out = await r.json();
-      setAi(out);
-      if (window.umami)
-        window.umami.track("report_prepared", { category: out.category, ai: "yes" });
-    } catch (e) {
-      setManual(true);
-      if (window.umami)
-        window.umami.track("report_prepared", { category: cat || "rc7", ai: "fallback" });
+      const j = await r.json();
+      if (j.emergency) {
+        setResult(j);
+        setPhase("emergency");
+      } else if (j.ok && (j.caseNumber || j.dryRun)) {
+        setResult(j);
+        setPhase("done");
+        if (window.umami)
+          window.umami.track("report_filed", { category: j.category || "unknown" });
+      } else {
+        setErrMsg(j.error || "");
+        setPhase("failed");
+      }
+    } catch (err) {
+      setErrMsg(String(err && err.message ? err.message : err));
+      setPhase("failed");
     } finally {
-      setLoading(false);
+      if (fileRef.current) fileRef.current.value = "";
     }
-  };
+  }
 
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(reportText());
-      setCopied(true);
-      if (window.umami) window.umami.track("report_copied", { category: cat });
-    } catch (e) {
-      setCopied(false);
-    }
-  };
-
-  const aiCatLabel =
-    ai && EN_TO_KEY[ai.category] ? t[EN_TO_KEY[ai.category]] : ai ? ai.category : "";
-
-  // Resolve which SF311 category page to hand the resident off to: prefer
-  // the AI-assigned category, fall back to the manually selected one, then
-  // to the general services directory if neither maps cleanly.
-  const resolvedCatKey = (ai && !manual && EN_TO_KEY[ai.category]) || cat || "";
-  const finishUrl = KEY_TO_URL[resolvedCatKey] || GENERAL_URL;
-
-  const showEmergency = ai && ai.emergency;
-  const showFollowup = ai && !ai.emergency && ai.needs_more_info;
-  const showCard = (ai && !ai.emergency && !ai.needs_more_info) || manual;
+  const busy = phase === "locating" || phase === "filing";
 
   return (
     <section style={{ paddingBottom: 64 }}>
@@ -155,66 +137,103 @@ export default function ReportForm({ t }) {
         </span>
         <div style={{ flex: 1, height: 1, background: C.hairline }} />
       </div>
-      <p style={{ ...serif, fontSize: 15.5, fontStyle: "italic", color: C.muted, margin: "-10px 0 6px", lineHeight: 1.5 }}>
-        {t.reportIntro}
+      <p
+        style={{
+          ...serif,
+          fontSize: 15.5,
+          fontStyle: "italic",
+          color: C.muted,
+          margin: "-10px 0 6px",
+          lineHeight: 1.5,
+        }}
+      >
+        {t.rOneTapIntro}
       </p>
 
-      <label htmlFor="report-desc" style={labelStyle}>{t.rDescription}</label>
-      <textarea
-        id="report-desc"
-        value={desc}
-        onChange={(e) => setDesc(e.target.value)}
-        placeholder={t.rDescPlaceholder}
-        rows={4}
-        style={{ ...inputStyle, resize: "vertical" }}
-      />
-
-      <label htmlFor="report-loc" style={labelStyle}>{t.rLocation}</label>
+      <label htmlFor="report-note" style={labelStyle}>
+        {t.rNoteLabel}
+      </label>
       <input
-        id="report-loc"
-        value={loc}
-        onChange={(e) => setLoc(e.target.value)}
-        placeholder={t.rLocPlaceholder}
+        id="report-note"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder={t.rNotePlaceholder}
         style={inputStyle}
+        maxLength={300}
       />
 
-      <label htmlFor="report-cat" style={labelStyle}>{t.rCategory}</label>
-      <select id="report-cat" value={cat} onChange={(e) => setCat(e.target.value)} style={inputStyle}>
-        <option value=""> </option>
-        {CATS.map((c) => (
-          <option key={c.key} value={c.key}>
-            {t[c.key]}
-          </option>
-        ))}
-      </select>
-
-      {error && (
-        <p style={{ ...sans, fontSize: 13, color: C.alert, marginTop: 12 }}>{t.rMissing2}</p>
-      )}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={onPhoto}
+        style={{ display: "none" }}
+      />
 
       <button
         type="button"
-        onClick={prepare}
-        disabled={loading}
+        onClick={() => fileRef.current && fileRef.current.click()}
+        disabled={busy}
         style={{
           ...caps,
           fontSize: 11,
           marginTop: 24,
-          padding: "15px 22px",
-          background: loading ? C.muted : C.navy,
+          padding: "18px 22px",
+          background: busy ? C.muted : C.navy,
           color: C.cream,
           border: "none",
           width: "100%",
-          cursor: loading ? "wait" : "pointer",
+          cursor: busy ? "wait" : "pointer",
         }}
       >
-        {loading ? t.rAnalyzing : t.rPrepare}
+        {phase === "locating"
+          ? t.rGettingLoc
+          : phase === "filing"
+          ? t.rFiling
+          : t.rSnap}
       </button>
 
-      {showEmergency && (
+      <p style={{ ...sans, fontSize: 12, color: C.muted, marginTop: 12, lineHeight: 1.5 }}>
+        {t.rAnonNote}
+      </p>
+
+      {phase === "needAddress" && (
+        <div style={{ marginTop: 20, border: `1px solid ${C.gold}`, background: "#FFFFFF", padding: 18 }}>
+          <p style={{ ...sans, fontSize: 14, color: C.ink, margin: 0, lineHeight: 1.5 }}>
+            {t.rNoLoc}
+          </p>
+          <input
+            value={addr}
+            onChange={(e) => setAddr(e.target.value)}
+            placeholder={t.rAddrPlaceholder}
+            style={{ ...inputStyle, marginTop: 12 }}
+          />
+          <button
+            type="button"
+            disabled={!addr.trim()}
+            onClick={() => file(null, addr.trim())}
+            style={{
+              ...caps,
+              fontSize: 10.5,
+              marginTop: 12,
+              padding: "12px 18px",
+              background: addr.trim() ? C.navy : C.muted,
+              color: C.cream,
+              border: "none",
+              width: "100%",
+              cursor: addr.trim() ? "pointer" : "default",
+            }}
+          >
+            {t.rFileNow}
+          </button>
+        </div>
+      )}
+
+      {phase === "emergency" && result && (
         <div style={{ marginTop: 28, border: `2px solid ${C.alert}`, background: "#FFFFFF", padding: "20px 18px" }}>
           <p dir="auto" style={{ ...sans, fontSize: 16, fontWeight: 600, color: C.alert, margin: 0, lineHeight: 1.5 }}>
-            {ai.summary_local}
+            {result.summary_local}
           </p>
           <a
             href="tel:911"
@@ -235,45 +254,48 @@ export default function ReportForm({ t }) {
         </div>
       )}
 
-      {showFollowup && (
-        <div style={{ marginTop: 28, border: `1px solid ${C.gold}`, background: "#FFFFFF", padding: "18px" }}>
-          <p dir="auto" style={{ ...sans, fontSize: 14.5, color: C.ink, margin: 0, lineHeight: 1.6 }}>
-            {ai.followup_question}
+      {phase === "done" && result && (
+        <div style={{ marginTop: 28, border: `1px solid ${C.hairline}`, background: "#FFFFFF", padding: "20px 18px" }}>
+          <div style={{ ...caps, fontSize: 10, color: C.gold }}>{t.rFiledTitle}</div>
+          {result.caseNumber && (
+            <div style={{ marginTop: 14 }}>
+              <span style={{ ...caps, fontSize: 10, color: C.muted }}>{t.rCaseNo}</span>
+              <div style={{ ...mono, fontSize: 22, color: C.ink, marginTop: 4 }}>
+                #{result.caseNumber}
+              </div>
+            </div>
+          )}
+          {result.summary_local && (
+            <p dir="auto" style={{ ...serif, fontSize: 15.5, color: C.ink, margin: "14px 0 0", lineHeight: 1.6 }}>
+              {result.summary_local}
+            </p>
+          )}
+          <p style={{ ...sans, fontSize: 12.5, color: C.muted, margin: "12px 0 0", lineHeight: 1.5 }}>
+            {result.address}
           </p>
+          {result.description && (
+            <pre
+              dir="auto"
+              style={{ ...mono, fontSize: 12.5, color: C.ink, whiteSpace: "pre-wrap", margin: "14px 0 0", textAlign: "start" }}
+            >
+              {result.description}
+            </pre>
+          )}
         </div>
       )}
 
-      {showCard && (
-        <div style={{ marginTop: 28, border: `1px solid ${C.hairline}`, background: "#FFFFFF", padding: "20px 18px" }}>
-          <div style={{ ...caps, fontSize: 10, color: C.gold }}>{t.rSummaryTitle}</div>
-          {ai && !manual && (
-            <p dir="auto" style={{ ...serif, fontSize: 15.5, color: C.ink, margin: "14px 0 0", lineHeight: 1.6 }}>
-              {ai.summary_local}
-            </p>
-          )}
-          {ai && !manual && (
-            <div style={{ ...caps, fontSize: 10, color: C.muted, marginTop: 14 }}>
-              {aiCatLabel}
-            </div>
-          )}
-          {manual && (
-            <p style={{ ...sans, fontSize: 12.5, color: C.muted, margin: "12px 0 0", lineHeight: 1.5 }}>
-              {t.rFallbackNote}
-            </p>
-          )}
-          <pre
-            dir="auto"
-            style={{ ...mono, fontSize: 12.5, color: C.ink, whiteSpace: "pre-wrap", margin: "14px 0 0", textAlign: "start" }}
-          >
-            {reportText()}
-          </pre>
-          <p style={{ ...sans, fontSize: 12, color: C.muted, marginTop: 14, lineHeight: 1.5 }}>
-            {t.rHandoffNote}
+      {phase === "failed" && (
+        <div style={{ marginTop: 28, border: `1px solid ${C.alert}`, background: "#FFFFFF", padding: 18 }}>
+          <p style={{ ...sans, fontSize: 13.5, color: C.ink, margin: 0, lineHeight: 1.6 }}>
+            {t.rFailNote}
           </p>
-          <div style={{ display: "flex", gap: 12, marginTop: 16, flexWrap: "wrap" }}>
+          {errMsg ? (
+            <p style={{ ...mono, fontSize: 11, color: C.muted, margin: "10px 0 0" }}>{errMsg}</p>
+          ) : null}
+          <div style={{ display: "flex", gap: 12, marginTop: 14, flexWrap: "wrap" }}>
             <button
               type="button"
-              onClick={copy}
+              onClick={() => setPhase("idle")}
               style={{
                 ...caps,
                 fontSize: 10.5,
@@ -283,17 +305,13 @@ export default function ReportForm({ t }) {
                 border: `1px solid ${C.ink}`,
                 cursor: "pointer",
                 flex: 1,
-                minWidth: 150,
+                minWidth: 140,
               }}
             >
-              {copied ? t.rCopied : t.rCopy}
+              {t.rTryAgain}
             </button>
             <a
-              href={finishUrl}
-              onClick={() => {
-                if (window.umami)
-                  window.umami.track("report_finished", { category: resolvedCatKey || "rc7" });
-              }}
+              href={SF311_FALLBACK}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -305,7 +323,7 @@ export default function ReportForm({ t }) {
                 textDecoration: "none",
                 textAlign: "center",
                 flex: 1,
-                minWidth: 150,
+                minWidth: 140,
               }}
             >
               {t.rFinish}

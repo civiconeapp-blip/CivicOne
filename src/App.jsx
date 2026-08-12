@@ -501,7 +501,7 @@ function Report311Page({ district, lang, setLang }) {
               {t.r311What}
             </p>
           </section>
-          <ReportForm t={t} />
+          <ReportForm t={t} lang={lang} />
 
           <section style={{ paddingTop: 8, paddingBottom: 24 }}>
             <SectionLabel>{t.ledgerLabel}</SectionLabel>
