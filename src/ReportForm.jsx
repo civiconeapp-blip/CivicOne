@@ -21,17 +21,21 @@ const caps = {
 };
 
 /* Categories mapped to SF311's taxonomy. English always included so
-   SF311 staff can route regardless of the writer's language. */
+   SF311 staff can route regardless of the writer's language.
+   `url` is the real sf.gov page for that category, verified against the
+   live site — each one links onward to the actual SF311 submission form. */
 const CATS = [
-  { key: "rc1", en: "Street or Sidewalk Cleaning" },
-  { key: "rc2", en: "Graffiti" },
-  { key: "rc3", en: "Pothole & Street Issues" },
-  { key: "rc4", en: "Streetlight Repair" },
-  { key: "rc5", en: "Abandoned Vehicle" },
-  { key: "rc6", en: "Encampment" },
-  { key: "rc7", en: "General Request" },
+  { key: "rc1", en: "Street or Sidewalk Cleaning", url: "https://sf.gov/request-street-or-sidewalk-cleaning/" },
+  { key: "rc2", en: "Graffiti", url: "https://sf.gov/report-graffiti-issues/" },
+  { key: "rc3", en: "Pothole & Street Issues", url: "https://sf.gov/report-pothole-and-street-issues/" },
+  { key: "rc4", en: "Streetlight Repair", url: "https://sf.gov/report-problem-streetlight/" },
+  { key: "rc5", en: "Abandoned Vehicle", url: "https://sf.gov/report-abandoned-vehicle/" },
+  { key: "rc6", en: "Encampment", url: "https://sf.gov/report-homeless-encampments/" },
+  { key: "rc7", en: "General Request", url: "https://sf.gov/topics--311-online-services/" },
 ];
 const EN_TO_KEY = Object.fromEntries(CATS.map((c) => [c.en, c.key]));
+const KEY_TO_URL = Object.fromEntries(CATS.map((c) => [c.key, c.url]));
+const GENERAL_URL = KEY_TO_URL.rc7;
 
 export default function ReportForm({ t }) {
   const [cat, setCat] = useState("");
@@ -132,6 +136,12 @@ export default function ReportForm({ t }) {
 
   const aiCatLabel =
     ai && EN_TO_KEY[ai.category] ? t[EN_TO_KEY[ai.category]] : ai ? ai.category : "";
+
+  // Resolve which SF311 category page to hand the resident off to: prefer
+  // the AI-assigned category, fall back to the manually selected one, then
+  // to the general services directory if neither maps cleanly.
+  const resolvedCatKey = (ai && !manual && EN_TO_KEY[ai.category]) || cat || "";
+  const finishUrl = KEY_TO_URL[resolvedCatKey] || GENERAL_URL;
 
   const showEmergency = ai && ai.emergency;
   const showFollowup = ai && !ai.emergency && ai.needs_more_info;
@@ -279,9 +289,10 @@ export default function ReportForm({ t }) {
               {copied ? t.rCopied : t.rCopy}
             </button>
             <a
-              href="https://www.sf311.org"
+              href={finishUrl}
               onClick={() => {
-                if (window.umami) window.umami.track("report_finished", { category: cat });
+                if (window.umami)
+                  window.umami.track("report_finished", { category: resolvedCatKey || "rc7" });
               }}
               target="_blank"
               rel="noopener noreferrer"
