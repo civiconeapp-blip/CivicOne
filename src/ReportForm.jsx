@@ -33,23 +33,54 @@ export default function ReportForm({ t, lang }) {
   const [result, setResult] = useState(null);
   const [errMsg, setErrMsg] = useState("");
   const [addr, setAddr] = useState("");
+  const [locError, setLocError] = useState(null); // null | "denied" | "unavailable" | "unsupported"
   const pendingPhoto = useRef(null);
   const coordsPromiseRef = useRef(null);
 
   // Ask for location permission the moment the user taps Report (a real user
   // gesture) so the browser reliably shows the prompt, and cache the result.
   function requestLocation() {
+    setLocError(null);
     if (!("geolocation" in navigator)) {
+      setLocError("unsupported");
       coordsPromiseRef.current = Promise.resolve(null);
       return;
     }
-    coordsPromiseRef.current = new Promise((resolve) => {
+    // Browsers silently refuse geolocation on an insecure (non-HTTPS,
+    // non-localhost) origin — no prompt, no error, getCurrentPosition just
+    // never resolves usefully. Catch that case explicitly instead of
+    // leaving the resident stuck on "Getting your location…".
+    if (!window.isSecureContext) {
+      console.warn(
+        "Geolocation blocked: page is not a secure context (requires HTTPS or localhost)."
+      );
+      setLocError("unsupported");
+      coordsPromiseRef.current = Promise.resolve(null);
+      return;
+    }
+    const GEO_TIMEOUT_MS = 20000;
+    const nativeAttempt = new Promise((resolve) => {
       navigator.geolocation.getCurrentPosition(
         (pos) => resolve(pos.coords),
-        () => resolve(null),
-        { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 }
+        (err) => {
+          console.warn("Geolocation failed:", err && err.code, err && err.message);
+          setLocError(err && err.code === err.PERMISSION_DENIED ? "denied" : "unavailable");
+          resolve(null);
+        },
+        { enableHighAccuracy: true, timeout: GEO_TIMEOUT_MS, maximumAge: 60000 }
       );
     });
+    // Some browsers never invoke getCurrentPosition's own error/timeout
+    // callback at all — e.g. a permission prompt left unanswered — which
+    // would otherwise strand the UI on "Getting your location…" forever.
+    // A second, independent timer guarantees this always settles.
+    const hardTimeout = new Promise((resolve) => {
+      setTimeout(() => {
+        setLocError((prev) => prev || "unavailable");
+        resolve(null);
+      }, GEO_TIMEOUT_MS + 2000);
+    });
+    coordsPromiseRef.current = Promise.race([nativeAttempt, hardTimeout]);
   }
 
   const labelStyle = {
@@ -91,17 +122,14 @@ export default function ReportForm({ t, lang }) {
     setResult(null);
     setErrMsg("");
     setPhase("locating");
-    // Use the location request kicked off when Report was tapped; if that
-    // wasn't started (or was denied/unavailable), try once more, then fall
-    // back to manual address entry.
+    // Use the location request kicked off when Report was tapped. If it
+    // wasn't started for some reason, start it now (still worth trying —
+    // this handler itself runs from the user's file-picker selection, a
+    // gesture most browsers still honor for a permission prompt).
     let coords = null;
     try {
-      coords =
-        (coordsPromiseRef.current && (await coordsPromiseRef.current)) || null;
-      if (!coords) {
-        requestLocation();
-        coords = await coordsPromiseRef.current;
-      }
+      if (!coordsPromiseRef.current) requestLocation();
+      coords = (await coordsPromiseRef.current) || null;
     } catch {
       coords = null;
     }
@@ -257,6 +285,11 @@ export default function ReportForm({ t, lang }) {
           <p style={{ ...sans, fontSize: 14, color: C.ink, margin: 0, lineHeight: 1.5 }}>
             {t.rNoLoc}
           </p>
+          {locError === "denied" && (
+            <p style={{ ...sans, fontSize: 12.5, color: C.alert, margin: "8px 0 0", lineHeight: 1.5 }}>
+              {t.rLocDenied}
+            </p>
+          )}
           <button
             type="button"
             onClick={retryLocation}
