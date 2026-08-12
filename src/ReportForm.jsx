@@ -29,10 +29,28 @@ export default function ReportForm({ t, lang }) {
   const fileRef = useRef(null);
   const [phase, setPhase] = useState("idle"); // idle | locating | filing | done | emergency | needAddress | failed
   const [note, setNote] = useState("");
+  const [email, setEmail] = useState("");
   const [result, setResult] = useState(null);
   const [errMsg, setErrMsg] = useState("");
   const [addr, setAddr] = useState("");
   const pendingPhoto = useRef(null);
+  const coordsPromiseRef = useRef(null);
+
+  // Ask for location permission the moment the user taps Report (a real user
+  // gesture) so the browser reliably shows the prompt, and cache the result.
+  function requestLocation() {
+    if (!("geolocation" in navigator)) {
+      coordsPromiseRef.current = Promise.resolve(null);
+      return;
+    }
+    coordsPromiseRef.current = new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve(pos.coords),
+        () => resolve(null),
+        { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 }
+      );
+    });
+  }
 
   const labelStyle = {
     ...caps,
@@ -73,16 +91,21 @@ export default function ReportForm({ t, lang }) {
     setResult(null);
     setErrMsg("");
     setPhase("locating");
+    // Use the location request kicked off when Report was tapped; if that
+    // wasn't started (or was denied/unavailable), try once more, then fall
+    // back to manual address entry.
     let coords = null;
     try {
-      const pos = await new Promise((res, rej) =>
-        navigator.geolocation.getCurrentPosition(res, rej, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-        })
-      );
-      coords = pos.coords;
+      coords =
+        (coordsPromiseRef.current && (await coordsPromiseRef.current)) || null;
+      if (!coords) {
+        requestLocation();
+        coords = await coordsPromiseRef.current;
+      }
     } catch {
+      coords = null;
+    }
+    if (!coords) {
       setPhase("needAddress");
       return;
     }
@@ -103,6 +126,7 @@ export default function ReportForm({ t, lang }) {
           lng: coords ? coords.longitude : undefined,
           address: manualAddress || undefined,
           note: note.trim() || undefined,
+          email: email.trim() || undefined,
           lang,
         }),
       });
@@ -150,6 +174,19 @@ export default function ReportForm({ t, lang }) {
         {t.rOneTapIntro}
       </p>
 
+      <label htmlFor="report-email" style={labelStyle}>
+        {t.rEmailLabel}
+      </label>
+      <input
+        id="report-email"
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="name@example.com"
+        style={inputStyle}
+        maxLength={120}
+      />
+
       <label htmlFor="report-note" style={labelStyle}>
         {t.rNoteLabel}
       </label>
@@ -173,7 +210,10 @@ export default function ReportForm({ t, lang }) {
 
       <button
         type="button"
-        onClick={() => fileRef.current && fileRef.current.click()}
+        onClick={() => {
+          requestLocation();
+          if (fileRef.current) fileRef.current.click();
+        }}
         disabled={busy}
         style={{
           ...caps,
@@ -235,7 +275,7 @@ export default function ReportForm({ t, lang }) {
           <p dir="auto" style={{ ...sans, fontSize: 16, fontWeight: 600, color: C.alert, margin: 0, lineHeight: 1.5 }}>
             {result.summary_local}
           </p>
-          <a
+          
             href="tel:911"
             style={{
               ...caps,
@@ -310,7 +350,7 @@ export default function ReportForm({ t, lang }) {
             >
               {t.rTryAgain}
             </button>
-            <a
+            
               href={SF311_FALLBACK}
               target="_blank"
               rel="noopener noreferrer"
