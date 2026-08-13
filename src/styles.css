@@ -35,3 +35,119 @@ textarea:focus-visible {
   outline: 2px solid #a9863a;
   outline-offset: 2px;
 }
+
+/* ---------- Civic UI motion ----------
+   Everything below is decoration. The prefers-reduced-motion block at the
+   end switches all of it off, so a resident who has asked their device for
+   less movement gets a completely still page. */
+
+/* Sections lift in as they scroll into view */
+.cv-reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  will-change: opacity, transform;
+}
+.cv-reveal-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Fog rolling across the skyline, three banks at three speeds */
+.cv-fog {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.cv-fog-1 { animation: cvFogA 41s linear infinite; }
+.cv-fog-2 { animation: cvFogB 67s linear infinite; }
+.cv-fog-3 { animation: cvFogC 53s linear infinite; opacity: 0.7; }
+
+@keyframes cvFogA {
+  0%   { transform: translateX(-38%); }
+  50%  { transform: translateX(30%); }
+  100% { transform: translateX(-38%); }
+}
+@keyframes cvFogB {
+  0%   { transform: translateX(26%); }
+  50%  { transform: translateX(-32%); }
+  100% { transform: translateX(26%); }
+}
+@keyframes cvFogC {
+  0%   { transform: translateX(-20%) scaleX(1); }
+  50%  { transform: translateX(24%) scaleX(1.12); }
+  100% { transform: translateX(-20%) scaleX(1); }
+}
+
+/* Morning sun breathing behind the fog */
+.cv-sun { animation: cvSun 14s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes cvSun {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* Windows flickering on, slightly out of step with each other */
+.cv-windows rect,
+.cv-windows circle { animation: cvWindow 9s ease-in-out infinite; }
+.cv-windows rect:nth-child(2n)  { animation-delay: -2.4s; }
+.cv-windows rect:nth-child(3n)  { animation-delay: -5.1s; }
+.cv-windows rect:nth-child(5n)  { animation-delay: -7.3s; }
+@keyframes cvWindow {
+  0%, 100% { opacity: 0.45; }
+  50%      { opacity: 1; }
+}
+
+/* Live-data pulse */
+.cv-live { position: relative; animation: cvLive 2.4s ease-in-out infinite; }
+@keyframes cvLive {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+  50%      { box-shadow: 0 0 0 4px rgba(47, 107, 79, 0); opacity: 0.55; }
+}
+
+/* Service cards */
+.cv-card {
+  border: 1px solid #e4e0d6;
+  background: #ffffff;
+  padding: 18px 18px 17px;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.cv-card:hover,
+.cv-card:focus-within {
+  transform: translateY(-2px);
+  border-color: #c9b27a;
+  box-shadow: 0 10px 26px -18px rgba(16, 24, 38, 0.55);
+}
+.cv-card:active { transform: translateY(0); }
+.cv-card-arrow { transition: transform 0.22s ease; display: inline-block; }
+.cv-card:hover .cv-card-arrow { transform: translateX(3px); }
+[dir="rtl"] .cv-card:hover .cv-card-arrow { transform: translateX(-3px); }
+.cv-card-icon { transition: background 0.22s ease, border-color 0.22s ease; }
+.cv-card:hover .cv-card-icon { background: #f3ecdb; border-color: #a9863a; }
+.cv-card-title { transition: color 0.22s ease; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .cv-fog-1,
+  .cv-fog-2,
+  .cv-fog-3,
+  .cv-sun,
+  .cv-live,
+  .cv-windows rect,
+  .cv-windows circle {
+    animation: none;
+  }
+  .cv-card,
+  .cv-card-arrow,
+  .cv-card-icon,
+  .cv-card-title {
+    transition: none;
+  }
+  .cv-card:hover,
+  .cv-card:focus-within {
+    transform: none;
+  }
+  .cv-card:hover .cv-card-arrow { transform: none; }
+}
