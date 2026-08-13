@@ -7,6 +7,7 @@ import { translateCategory } from "./cat311.js";
 import ProgramGuideRoute from "./ProgramGuide.jsx";
 import EventsCalendar from "./EventsCalendar.jsx";
 import { upcomingEvents } from "./events.js";
+import { GovBar, CivicMark, SkylineHero, Reveal, LiveDot, StatusChip, ServiceCard, ICONS } from "./civic.jsx";
 
 /* ---------- Phase 2: device-side personalization (no accounts, nothing sent to any server) ---------- */
 const LANG_KEY = "civicone.lang";
@@ -136,6 +137,63 @@ function BayBridge({ caption }) {
   );
 }
 
+
+/* ---------- Shared chrome ----------
+   The utility bar and masthead every page opens with. Pulled out of the
+   individual routes so the language switcher and the district badge can't
+   drift apart between the district page and the 311 page. */
+function LangNav({ lang, setLang, t, tone = "dark" }) {
+  const on = tone === "dark" ? C.cream : C.ink;
+  const off = tone === "dark" ? "rgba(245,242,234,0.6)" : C.muted;
+  return (
+    <nav style={{ display: "flex", gap: 14, flexWrap: "wrap" }} aria-label={t.langNav}>
+      {LANGS.map((l) => (
+        <button
+          type="button"
+          key={l.code}
+          onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
+          aria-current={lang === l.code ? "true" : undefined}
+          style={{
+            ...sans,
+            fontSize: 12,
+            padding: "0 0 2px",
+            color: lang === l.code ? on : off,
+            fontWeight: lang === l.code ? 600 : 400,
+            borderBottom: lang === l.code ? `1.5px solid ${C.gold}` : "1.5px solid transparent",
+            transition: "color 0.2s, border-color 0.2s",
+          }}
+        >
+          {l.label}
+        </button>
+      ))}
+    </nav>
+  );
+}
+
+function Masthead({ t, lang, setLang, rtl, badge }) {
+  return (
+    <>
+      <GovBar jurisdiction={t.city} rtl={rtl}>
+        <LangNav lang={lang} setLang={setLang} t={t} tone="dark" />
+      </GovBar>
+      <div dir={rtl ? "rtl" : "ltr"} style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px" }}>
+        <header style={{ paddingTop: 26 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <CivicMark size={38} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h1 style={{ ...serif, fontSize: 27, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em", lineHeight: 1.1 }}>
+                Civic One
+              </h1>
+              <div style={{ ...caps, fontSize: 9.5, color: C.gold, marginTop: 3 }}>{badge}</div>
+            </div>
+          </div>
+          <div style={{ height: 1, background: C.ink, marginTop: 18 }} />
+        </header>
+      </div>
+    </>
+  );
+}
+
 /* ---------- Pieces ---------- */
 function SectionLabel({ children }) {
   return (
@@ -145,49 +203,19 @@ function SectionLabel({ children }) {
     </div>
   );
 }
-function ServiceRow({ title, desc, rtl, href, to }) {
-  const [hover, setHover] = useState(false);
+function ServiceRow({ title, desc, rtl, href, to, icon, delay = 0 }) {
   const Tag = to ? Link : "a";
-  const linkProps = to
-    ? { to }
-    : { href, target: "_blank", rel: "noopener noreferrer" };
+  const linkProps = to ? { to } : { href, target: "_blank", rel: "noopener noreferrer" };
   return (
-    <Tag
-      {...linkProps}
-      onClick={() => { if (window.umami) window.umami.track("service_tap", { service: to || href }); }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      style={{
-        textDecoration: "none",
-                width: "100%",
-        textAlign: "start",
-        padding: "20px 0",
-        display: "flex",
-        alignItems: "baseline",
-        justifyContent: "space-between",
-        gap: 24,
-        borderBottom: `1px solid ${C.hairline}`,
-      }}
-    >
-      <div>
-        <span
-          style={{
-            ...serif,
-            fontSize: 21,
-            fontWeight: 500,
-            color: C.ink,
-            borderBottom: hover ? `1px solid ${C.gold}` : "1px solid transparent",
-            transition: "border-color 0.2s",
-          }}
-        >
-          {title}
-        </span>
-        <div style={{ ...sans, fontSize: 13, color: C.muted, marginTop: 5 }}>{desc}</div>
-      </div>
-      <span style={{ ...serif, color: hover ? C.gold : C.muted, fontSize: 20, transition: "color 0.2s" }}>
-        {rtl ? "←" : "→"}
-      </span>
-    </Tag>
+    <Reveal delay={delay}>
+      <Tag
+        {...linkProps}
+        onClick={() => { if (window.umami) window.umami.track("service_tap", { service: to || href }); }}
+        style={{ textDecoration: "none", display: "block" }}
+      >
+        <ServiceCard title={title} desc={desc} icon={icon} rtl={rtl} />
+      </Tag>
+    </Reveal>
   );
 }
 
@@ -213,70 +241,34 @@ function DistrictView({ district, lang, setLang }) {
 
   return (
     <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
+      <Masthead t={t} lang={lang} setLang={setLang} rtl={rtl} badge={featured ? t.district : t.districtFmt.replace("{n}", d)} />
       <div
         dir={rtl ? "rtl" : "ltr"}
         style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 80px" }}
       >
-        <header style={{ paddingTop: 48, ...fade(0) }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-            <span style={{ ...caps, fontSize: 10.5, color: C.muted }}>{t.city}</span>
-            <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>
-              {featured ? t.district : t.districtFmt.replace("{n}", d)}
-            </span>
-          </div>
-          <div style={{ height: 1, background: C.ink, margin: "16px 0" }} />
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-            <h1 style={{ ...serif, fontSize: 34, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em" }}>
-              Civic One
-            </h1>
-            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label={t.langNav}>
-              {LANGS.map((l) => (
-                <button
-                  type="button"
-                  key={l.code}
-                                    onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
-
-                  style={{
-                    ...sans,
-                    fontSize: 12.5,
-                    padding: "0 0 2px",
-                    color: lang === l.code ? C.ink : C.muted,
-                    fontWeight: lang === l.code ? 600 : 400,
-                    borderBottom: lang === l.code ? `1.5px solid ${C.gold}` : "1.5px solid transparent",
-                    transition: "all 0.2s",
-                                      }}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-          <div style={{ height: 1, background: C.hairline, marginTop: 16 }} />
-        </header>
-
-        <section style={{ padding: "56px 0", ...fade(0.15) }}>
+        <section style={{ padding: "40px 0 48px", ...fade(0.15) }}>
           <h2 style={{ ...serif, fontSize: 44, fontWeight: 400, color: C.ink, lineHeight: 1.08, letterSpacing: "-0.015em" }}>
             {t.hello}
           </h2>
-          <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, marginTop: 16, lineHeight: 1.55, maxWidth: 460 }}>
+          <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, margin: "16px 0 26px", lineHeight: 1.55, maxWidth: 460 }}>
             {featured ? t.intro : t.introGeneric}
           </p>
-          <BayBridge caption={t.bridgeCaption} />
+          <SkylineHero caption={t.skylineCaption} />
         </section>
 
 
         <section style={{ paddingBottom: 64, ...fade(0.3) }}>
           <SectionLabel>{t.servicesLabel}</SectionLabel>
-          <div style={{ borderTop: `1px solid ${C.hairline}` }}>
-            <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} to={"/district/" + d + "/report"} />
-            <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} to="/apply/transit" />
-            <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} to="/apply/food" />
-            <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} to="/apply/housing" />
-            <ServiceRow title={t.sHealth} desc={t.sHealthd} rtl={rtl} to="/apply/health" />
+          <div style={{ display: "grid", gap: 12 }}>
+            <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} icon={ICONS.report} to={"/district/" + d + "/report"} delay={0} />
+            <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} icon={ICONS.transit} to="/apply/transit" delay={0.05} />
+            <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} icon={ICONS.food} to="/apply/food" delay={0.1} />
+            <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} icon={ICONS.housing} to="/apply/housing" delay={0.15} />
+            <ServiceRow title={t.sHealth} desc={t.sHealthd} rtl={rtl} icon={ICONS.health} to="/apply/health" delay={0.2} />
             {featured && (
               <>
-                <ServiceRow title={t.s5} desc={t.s5d} rtl={rtl} to="/apply/paratransit" />
-                <ServiceRow title={t.s7} desc={t.s7d} rtl={rtl} href={LINKS.s7} />
+                <ServiceRow title={t.s5} desc={t.s5d} rtl={rtl} icon={ICONS.access} to="/apply/paratransit" delay={0.25} />
+                <ServiceRow title={t.s7} desc={t.s7d} rtl={rtl} icon={ICONS.community} href={LINKS.s7} delay={0.3} />
               </>
             )}
           </div>
@@ -313,7 +305,7 @@ function DistrictView({ district, lang, setLang }) {
           </div>
         </section>
 
-        <section style={{ paddingBottom: 56, ...fade(0.5) }}>
+        <section style={{ paddingTop: 56, paddingBottom: 56, ...fade(0.5) }}>
           <SectionLabel>{t.evLabel}</SectionLabel>
           <Link
             to={"/district/" + d + "/events" }
@@ -453,41 +445,10 @@ function Report311Page({ district, lang, setLang }) {
 
   return (
     <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
+      <Masthead t={t} lang={lang} setLang={setLang} rtl={rtl} badge={t.districtFmt.replace("{n}", d)} />
       <div dir={rtl ? "rtl" : "ltr"} style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 80px" }}>
-        <header style={{ paddingTop: 48 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-            <span style={{ ...caps, fontSize: 10.5, color: C.muted }}>{t.city}</span>
-            <span style={{ ...caps, fontSize: 10.5, color: C.gold }}>{t.districtFmt.replace("{n}", d)}</span>
-          </div>
-          <div style={{ height: 1, background: C.ink, margin: "16px 0" }} />
-          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-            <h1 style={{ ...serif, fontSize: 28, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em" }}>Civic One</h1>
-            <nav style={{ display: "flex", gap: 16, flexWrap: "wrap" }} aria-label={t.langNav}>
-              {LANGS.map((l) => (
-                <button
-                  type="button"
-                  key={l.code}
-                  onClick={() => { setLang(l.code); if (window.umami) window.umami.track("language_switch", { lang: l.code }); }}
-                  style={{
-                    ...sans,
-                    fontSize: 12.5,
-                    padding: "0 0 2px",
-                    color: lang === l.code ? C.ink : C.muted,
-                    fontWeight: lang === l.code ? 600 : 400,
-                    borderBottom: lang === l.code ? `1.5px solid ${C.gold}` : "1.5px solid transparent",
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {l.label}
-                </button>
-              ))}
-            </nav>
-          </div>
-          <div style={{ height: 1, background: C.hairline, marginTop: 16 }} />
-        </header>
-
         <main>
-          <section style={{ padding: "40px 0 8px" }}>
+          <section style={{ padding: "40px 0 44px" }}>
             <Link
               to={"/district/" + d}
               style={{ ...sans, fontSize: 12.5, color: C.muted, textDecoration: "none" }}
@@ -497,7 +458,7 @@ function Report311Page({ district, lang, setLang }) {
             <h2 style={{ ...serif, fontSize: 36, fontWeight: 400, color: C.ink, lineHeight: 1.1, marginTop: 22 }}>
               {t.r311Label}
             </h2>
-            <p style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.muted, marginTop: 14, lineHeight: 1.55, maxWidth: 520 }}>
+            <p style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.muted, margin: "14px 0 0", lineHeight: 1.55, maxWidth: 520 }}>
               {t.r311What}
             </p>
           </section>
@@ -505,7 +466,8 @@ function Report311Page({ district, lang, setLang }) {
 
           <section style={{ paddingTop: 8, paddingBottom: 24 }}>
             <SectionLabel>{t.ledgerLabel}</SectionLabel>
-            <p style={{ ...sans, fontSize: 11.5, color: C.muted, margin: "-16px 0 20px" }}>
+            <p style={{ ...sans, fontSize: 11.5, color: C.muted, margin: "-16px 0 20px", display: "flex", alignItems: "center", gap: 7 }}>
+              {!fetchError && <LiveDot />}
               {fetchError ? t.ledgerError : featured ? t.ledgerNote : t.ledgerNoteAny.replace("{d}", d)}
             </p>
             {pulse && (
@@ -537,18 +499,7 @@ function Report311Page({ district, lang, setLang }) {
                     </div>
                     <div style={{ textAlign: "end" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
-                        <span
-                          style={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: 99,
-                            background: STATUS_COLOR[r.status],
-                            display: "inline-block",
-                          }}
-                        />
-                        <span style={{ ...sans, fontSize: 12, fontWeight: 600, color: STATUS_COLOR[r.status] }}>
-                          {t[r.status]}
-                        </span>
+                        <StatusChip label={t[r.status]} tone={r.status} />
                       </div>
                       <div style={{ ...mono, fontSize: 11, color: C.muted, marginTop: 4 }}>
                         № {r.id} · {r.date}
