@@ -2,16 +2,16 @@ import { useRef, useState } from "react";
 
 /* Local design tokens (matches App.jsx "City Briefing" system) */
 const C = {
-  ink: "#101826",
-  navy: "#152B45",
-  gold: "#A9863A",
-  hairline: "#E4E0D6",
-  muted: "#6B7280",
-  cream: "#F5F2EA",
+  ink: "#1B1B1B",
+  navy: "#14315C",
+  gold: "#0A5CB8",
+  hairline: "#D4DAE1",
+  muted: "#4A5568",
+  cream: "#EAF1FB",
   alert: "#A6431F",
 };
-const serif = { fontFamily: "'Newsreader', serif" };
-const sans = { fontFamily: "'Public Sans', sans-serif" };
+const serif = { fontFamily: "'Rubik', system-ui, sans-serif" };
+const sans = { fontFamily: "'Rubik', system-ui, sans-serif" };
 const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 const caps = {
   ...sans,
@@ -263,8 +263,7 @@ export default function ReportForm({ t, lang }) {
         style={{
           ...serif,
           fontSize: 15.5,
-          fontStyle: "italic",
-          color: C.muted,
+                    color: C.muted,
           margin: "-10px 0 6px",
           lineHeight: 1.5,
         }}
@@ -318,7 +317,7 @@ export default function ReportForm({ t, lang }) {
           fontSize: 11,
           marginTop: 24,
           padding: "18px 22px",
-          background: busy ? C.muted : C.navy,
+          background: busy ? C.muted : C.gold,
           color: C.cream,
           border: "none",
           width: "100%",
@@ -357,8 +356,8 @@ export default function ReportForm({ t, lang }) {
               marginTop: 12,
               padding: "12px 18px",
               background: "#FFFFFF",
-              color: C.navy,
-              border: `1px solid ${C.navy}`,
+              color: C.gold,
+              border: `1px solid ${C.gold}`,
               width: "100%",
               cursor: "pointer",
             }}
@@ -385,7 +384,7 @@ export default function ReportForm({ t, lang }) {
               fontSize: 10.5,
               marginTop: 12,
               padding: "12px 18px",
-              background: addr.trim() ? C.navy : C.muted,
+              background: addr.trim() ? C.gold : C.muted,
               color: C.cream,
               border: "none",
               width: "100%",

@@ -5,17 +5,17 @@ import { T, LANGS } from "./i18n.js";
 
 /* Local design tokens (matches App.jsx "City Briefing" system) */
 const C = {
-  paper: "#F7F5F0",
-  ink: "#101826",
-  navy: "#152B45",
-  gold: "#A9863A",
-  goldLine: "#C9B27A",
-  hairline: "#E4E0D6",
-  muted: "#6B7280",
-  cream: "#F5F2EA",
+  paper: "#FFFFFF",
+  ink: "#1B1B1B",
+  navy: "#14315C",
+  gold: "#0A5CB8",
+  goldLine: "#9CC3F0",
+  hairline: "#D4DAE1",
+  muted: "#4A5568",
+  cream: "#EAF1FB",
 };
-const serif = { fontFamily: "'Newsreader', serif" };
-const sans = { fontFamily: "'Public Sans', sans-serif" };
+const serif = { fontFamily: "'Rubik', system-ui, sans-serif" };
+const sans = { fontFamily: "'Rubik', system-ui, sans-serif" };
 const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 const caps = {
   ...sans,
@@ -120,7 +120,7 @@ function ProgramGuideView({ program, lang, setLang }) {
         </header>
 
         <section style={{ padding: "40px 0 8px", ...fade(0.1) }}>
-          <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, lineHeight: 1.55 }}>
+          <p style={{ ...serif, fontSize: 19, color: C.muted, lineHeight: 1.55 }}>
             {program.intro}
           </p>
         </section>

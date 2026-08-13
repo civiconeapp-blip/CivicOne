@@ -9,9 +9,9 @@ html {
 }
 
 body {
-  background: #f7f5f0;
+  background: #ffffff;
   color: #101826;
-  font-family: "Public Sans", sans-serif;
+  font-family: "Rubik", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -32,7 +32,7 @@ button:focus-visible,
 select:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid #a9863a;
+  outline: 3px solid #0a5cb8;
   outline-offset: 2px;
 }
 
@@ -150,4 +150,70 @@ textarea:focus-visible {
     transform: none;
   }
   .cv-card:hover .cv-card-arrow { transform: none; }
+}
+
+/* ---------- SF.gov-shaped components ---------- */
+html, body { overflow-x: hidden; }
+
+.cv-nav { position: relative; padding-bottom: 3px; border-bottom: 3px solid transparent; }
+.cv-nav:hover { border-bottom-color: #0a5cb8; }
+
+.cv-rise { animation: cvRise 0.7s cubic-bezier(0.16, 0.84, 0.34, 1) both; }
+@keyframes cvRise {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.cv-tile { transition: transform 0.3s ease; }
+.cv-tile:hover { transform: translateY(-3px); }
+
+/* Primary button */
+.cv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 14px 26px;
+  background: #0a5cb8;
+  color: #ffffff;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+.cv-btn:hover { background: #07407f; }
+.cv-btn-arrow { transition: transform 0.2s ease; }
+.cv-btn:hover .cv-btn-arrow { transform: translateX(3px); }
+[dir="rtl"] .cv-btn:hover .cv-btn-arrow { transform: translateX(-3px); }
+
+/* Cards, SF.gov style: square corners, blue rule on hover, no drop shadow */
+.cv-card {
+  border: 1px solid #d4dae1;
+  background: #ffffff;
+  border-radius: 6px;
+  padding: 22px 20px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.cv-card:hover,
+.cv-card:focus-within {
+  border-color: #0a5cb8;
+  box-shadow: 0 6px 18px -12px rgba(10, 92, 184, 0.6);
+}
+.cv-card-arrow { transition: transform 0.2s ease; display: inline-block; }
+.cv-card:hover .cv-card-arrow { transform: translateX(3px); }
+[dir="rtl"] .cv-card:hover .cv-card-arrow { transform: translateX(-3px); }
+.cv-card-icon { transition: background 0.2s ease, border-color 0.2s ease; }
+.cv-card:hover .cv-card-icon { background: #eaf1fb; border-color: #0a5cb8; }
+
+/* Stack the two-column blocks on narrow screens */
+@media (max-width: 780px) {
+  .cv-hero-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .cv-hero-grid > .cv-tile { max-width: 340px; margin-inline: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-reveal { opacity: 1; transform: none; transition: none; }
+  .cv-fog, .cv-fog-1, .cv-fog-2, .cv-fog-3, .cv-sun, .cv-live,
+  .cv-windows rect, .cv-windows circle { animation: none; }
+  .cv-rise { animation: none; opacity: 1; transform: none; }
+  .cv-tile, .cv-btn, .cv-btn-arrow, .cv-card, .cv-card-arrow, .cv-card-icon, .cv-nav { transition: none; }
+  .cv-tile:hover { transform: none; }
+  .cv-card:hover .cv-card-arrow, .cv-btn:hover .cv-btn-arrow { transform: none; }
 }
