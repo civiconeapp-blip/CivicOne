@@ -201,156 +201,231 @@ export function GovBar({ jurisdiction, children, rtl }) {
   );
 }
 
-/* ---------- Skyline ----------
-   A San Francisco morning, drawn: Twin Peaks, Sutro Tower, Coit Tower on
-   Telegraph Hill, the Transamerica Pyramid, Salesforce Tower, the Ferry
-   Building clock, and fog rolling through on three layers at different
-   speeds. The fog is the whole point — it's the one thing in the city that
-   is always moving, so the page reads as alive without a carousel or a
-   video autoplaying on someone's data plan. */
-export function SkylineHero({ caption }) {
+/* ---------- Hero ----------
+   A San Francisco dawn, full-bleed and dark, with the headline set INTO the
+   scene rather than politely above it. The first screen is the one thing a
+   resident will remember, so it commits: deep navy sky burning to amber at
+   the horizon, the skyline in near-black, and four banks of fog crossing at
+   four speeds.
+
+   Everything is drawn — no photograph is loaded from anywhere. Hotlinking
+   stock imagery would hand every resident's IP to a third-party CDN, which
+   is precisely what the "no cookies, no personal information" line in the
+   footer promises not to do. */
+export function HeroScene({ eyebrow, title, subtitle, caption, children, brand, rtl }) {
   return (
-    <figure style={{ margin: 0 }}>
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          overflow: "hidden",
-          background: "linear-gradient(#F3EEE2 0%, #F7F5F0 58%, #F7F5F0 100%)",
-          border: `1px solid ${C.hairline}`,
-          lineHeight: 0,
-        }}
+    <section
+      className="cv-hero"
+      style={{
+        position: "relative",
+        width: "100vw",
+        marginInline: "calc(50% - 50vw)",
+        minHeight: "clamp(440px, 68vh, 600px)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        overflow: "hidden",
+        background: "linear-gradient(#0A1422 0%, #12233A 42%, #35405A 66%, #8A6A3E 86%, #D9A25C 100%)",
+        borderBottom: `3px solid ${C.gold}`,
+      }}
+    >
+      <svg
+        viewBox="0 0 800 424"
+        preserveAspectRatio="xMidYMax slice"
+        aria-label={caption}
+        role="img"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }}
       >
-        {/* meet, not slice: on a narrow phone a cropping fit would cut the sun
-            and Twin Peaks off the sides and leave a wall of buildings. */}
-        <svg
-          viewBox="0 0 800 234"
-          preserveAspectRatio="xMidYMid meet"
-          style={{ width: "100%", height: "auto", display: "block" }}
-          role="img"
-          aria-label={caption}
-        >
-          <defs>
-            <linearGradient id="cvSky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#EFE4CE" />
-              <stop offset="55%" stopColor="#F5F0E4" />
-              <stop offset="100%" stopColor="#F7F5F0" />
-            </linearGradient>
-            <radialGradient id="cvSun">
-              <stop offset="0%" stopColor="#E8C87A" stopOpacity="0.95" />
-              <stop offset="60%" stopColor="#E8C87A" stopOpacity="0.28" />
-              <stop offset="100%" stopColor="#E8C87A" stopOpacity="0" />
-            </radialGradient>
-            <linearGradient id="cvFog" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
-              <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0.62" />
-              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-            </linearGradient>
-            <filter id="cvFogBlur" x="-30%" y="-120%" width="160%" height="340%">
-              <feGaussianBlur stdDeviation="11" />
-            </filter>
-            <linearGradient id="cvWater" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#C9D4DC" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#C9D4DC" stopOpacity="0.12" />
-            </linearGradient>
-          </defs>
+        <defs>
+          <radialGradient id="cvGlow" cx="0.5" cy="0.5">
+            <stop offset="0%" stopColor="#FFD79A" stopOpacity="0.95" />
+            <stop offset="45%" stopColor="#F0B168" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#F0B168" stopOpacity="0" />
+          </radialGradient>
+          <linearGradient id="cvHaze" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#FFC98A" stopOpacity="0" />
+            <stop offset="100%" stopColor="#FFC07A" stopOpacity="0.5" />
+          </linearGradient>
+          <linearGradient id="cvBank" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#DCE6EE" stopOpacity="0" />
+            <stop offset="42%" stopColor="#DCE6EE" stopOpacity="0.78" />
+            <stop offset="100%" stopColor="#DCE6EE" stopOpacity="0" />
+          </linearGradient>
+          <filter id="cvSoft" x="-35%" y="-260%" width="170%" height="620%">
+            <feGaussianBlur stdDeviation="13" />
+          </filter>
+          {/* Film grain — keeps the flat gradient from banding on cheap panels */}
+          <filter id="cvGrain">
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch" />
+            <feColorMatrix type="saturate" values="0" />
+          </filter>
+        </defs>
 
-          <rect x="0" y="0" width="800" height="234" fill="url(#cvSky)" />
-          <g className="cv-sun">
-            <circle cx="648" cy="74" r="62" fill="url(#cvSun)" />
-            <circle cx="648" cy="74" r="15" fill="#E4BE68" opacity="0.9" />
+        {/* Dawn burning off behind the hills */}
+        <rect x="0" y="250" width="800" height="174" fill="url(#cvHaze)" />
+        <g className="cv-sun">
+          <circle cx="596" cy="352" r="132" fill="url(#cvGlow)" />
+          <circle cx="596" cy="352" r="26" fill="#FFDCA4" opacity="0.96" />
+        </g>
+
+        {/* Twin Peaks + Sutro Tower */}
+        <g fill="#0C1927" opacity="0.62">
+          <path d="M0 372 L74 300 L128 342 L196 282 L286 372 Z" />
+          <g stroke="#0C1927" strokeWidth="4" fill="none">
+            <path d="M196 282 L196 224" />
+            <path d="M182 244 L210 244 M178 262 L214 262" strokeWidth="3" />
           </g>
+        </g>
 
-          {/* Twin Peaks and Sutro Tower, far west */}
-          <g opacity="0.32">
-            <path d="M0 196 L58 150 L96 178 L140 142 L196 196 Z" fill={C.navySoft} />
-            <g stroke={C.navySoft} strokeWidth="2" fill="none">
-              <path d="M140 142 L140 108" />
-              <path d="M131 121 L149 121 M128 133 L152 133" strokeWidth="1.5" />
-            </g>
-          </g>
+        {/* Far bank */}
+        <g fill="#101F31" opacity="0.72">
+          <rect x="150" y="330" width="34" height="52" />
+          <rect x="192" y="312" width="26" height="70" />
+          <rect x="392" y="322" width="30" height="60" />
+          <rect x="430" y="336" width="38" height="46" />
+          <rect x="676" y="326" width="36" height="56" />
+          <rect x="720" y="342" width="30" height="40" />
+        </g>
 
-          {/* Bay */}
-          <rect x="0" y="205" width="800" height="29" fill="url(#cvWater)" />
+        {/* Telegraph Hill + Coit Tower */}
+        <g fill="#0A1522">
+          <path d="M56 384 Q120 336 190 384 Z" />
+          <rect x="114" y="292" width="19" height="56" rx="2" />
+          <rect x="111" y="286" width="25" height="9" rx="2" />
+        </g>
 
-          {/* Far skyline */}
-          <g fill={C.navySoft} opacity="0.34">
-            <rect x="206" y="168" width="26" height="42" />
-            <rect x="238" y="152" width="20" height="58" />
-            <rect x="352" y="160" width="24" height="50" />
-            <rect x="384" y="174" width="30" height="36" />
-            <rect x="536" y="158" width="22" height="52" />
-            <rect x="564" y="170" width="26" height="40" />
-            <rect x="700" y="164" width="30" height="46" />
-            <rect x="736" y="178" width="24" height="32" />
-          </g>
+        {/* Downtown, near-black */}
+        <g fill="#08111C">
+          <rect x="236" y="300" width="38" height="84" />
+          <rect x="278" y="272" width="28" height="112" />
+          <path d="M330 384 L356 190 L382 384 Z" />
+          <rect x="354" y="152" width="4" height="40" />
+          <rect x="396" y="288" width="32" height="96" />
+          <path d="M452 384 L452 168 Q466 138 480 168 L480 384 Z" />
+          <rect x="494" y="278" width="30" height="106" />
+          <rect x="530" y="308" width="26" height="76" />
+          <rect x="604" y="316" width="24" height="68" />
+          <path d="M604 316 L616 292 L628 316 Z" />
+          <rect x="578" y="352" width="78" height="32" />
+          <rect x="668" y="296" width="34" height="88" />
+          <rect x="708" y="326" width="28" height="58" />
+        </g>
 
-          {/* Telegraph Hill + Coit Tower */}
-          <g fill={C.navy} opacity="0.9">
-            <path d="M96 210 Q140 178 186 210 Z" />
-            <rect x="136" y="150" width="15" height="42" rx="2" />
-            <rect x="134" y="146" width="19" height="7" rx="2" />
-          </g>
+        {/* Lit windows */}
+        <g fill="#F2C879" className="cv-windows">
+          <rect x="246" y="316" width="5" height="8" />
+          <rect x="258" y="340" width="5" height="8" />
+          <rect x="288" y="292" width="5" height="8" />
+          <rect x="406" y="306" width="5" height="8" />
+          <rect x="461" y="196" width="5" height="8" />
+          <rect x="469" y="242" width="5" height="8" />
+          <rect x="504" y="300" width="5" height="8" />
+          <rect x="678" y="318" width="5" height="8" />
+          <rect x="540" y="330" width="5" height="8" />
+          <circle cx="616" cy="330" r="4.5" fill="none" stroke="#F2C879" strokeWidth="1.6" />
+        </g>
 
-          {/* Downtown */}
-          <g fill={C.navy}>
-            <rect x="268" y="150" width="30" height="60" />
-            <rect x="300" y="132" width="22" height="78" />
-            {/* Transamerica Pyramid */}
-            <path d="M352 210 L372 96 L392 210 Z" />
-            <rect x="370.5" y="74" width="3" height="24" />
-            <rect x="404" y="146" width="26" height="64" />
-            {/* Salesforce Tower */}
-            <path d="M452 210 L452 82 Q463 62 474 82 L474 210 Z" />
-            <rect x="486" y="140" width="24" height="70" />
-            <rect x="516" y="158" width="20" height="52" />
-            {/* Ferry Building clock tower */}
-            <rect x="592" y="164" width="20" height="46" />
-            <path d="M592 164 L602 148 L612 164 Z" />
-            <rect x="570" y="188" width="64" height="22" />
-            <rect x="646" y="150" width="28" height="60" />
-            <rect x="678" y="170" width="22" height="40" />
-          </g>
+        {/* Fog: four banks, four speeds — the city's only constant motion */}
+        <g filter="url(#cvSoft)">
+          <ellipse className="cv-fog cv-fog-1" cx="180" cy="344" rx="330" ry="21" fill="url(#cvBank)" />
+          <ellipse className="cv-fog cv-fog-2" cx="580" cy="368" rx="380" ry="17" fill="url(#cvBank)" />
+          <ellipse className="cv-fog cv-fog-3" cx="380" cy="318" rx="270" ry="13" fill="url(#cvBank)" />
+          <ellipse className="cv-fog cv-fog-4" cx="460" cy="386" rx="430" ry="15" fill="url(#cvBank)" />
+        </g>
 
-          {/* Lit windows — the city is awake, but only just */}
-          <g fill={C.goldLine} className="cv-windows">
-            <rect x="276" y="162" width="4" height="6" />
-            <rect x="286" y="176" width="4" height="6" />
-            <rect x="308" y="150" width="4" height="6" />
-            <rect x="412" y="160" width="4" height="6" />
-            <rect x="459" y="104" width="4" height="6" />
-            <rect x="465" y="132" width="4" height="6" />
-            <rect x="494" y="158" width="4" height="6" />
-            <rect x="654" y="168" width="4" height="6" />
-            <circle cx="602" cy="172" r="3.4" fill="none" stroke={C.goldLine} strokeWidth="1.2" />
-          </g>
+        <rect x="0" y="0" width="800" height="424" filter="url(#cvGrain)" opacity="0.05" />
+        {/* Weight under the type so it stays legible over the brightest dawn */}
+        <rect x="0" y="120" width="800" height="304" fill="url(#cvScrim)" />
+        <defs>
+          <linearGradient id="cvScrim" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#050B14" stopOpacity="0" />
+            <stop offset="70%" stopColor="#050B14" stopOpacity="0.34" />
+            <stop offset="100%" stopColor="#050B14" stopOpacity="0.52" />
+          </linearGradient>
+        </defs>
+      </svg>
 
-          {/* Ground line, letterpress rule */}
-          <line x1="0" y1="210" x2="800" y2="210" stroke={C.ink} strokeWidth="1.25" opacity="0.55" />
-
-          {/* Fog: three banks, three speeds */}
-          <g filter="url(#cvFogBlur)">
-            <ellipse className="cv-fog cv-fog-1" cx="200" cy="188" rx="300" ry="19" fill="url(#cvFog)" />
-            <ellipse className="cv-fog cv-fog-2" cx="560" cy="201" rx="350" ry="15" fill="url(#cvFog)" />
-            <ellipse className="cv-fog cv-fog-3" cx="380" cy="172" rx="250" ry="11" fill="url(#cvFog)" />
-          </g>
-        </svg>
-      </div>
-      {caption && (
-        <figcaption
+      {brand && (
+        <div
+          dir={rtl ? "rtl" : "ltr"}
+          className="cv-rise"
           style={{
-            ...caps,
-            fontSize: 9,
-            letterSpacing: "0.22em",
-            color: C.muted,
-            textAlign: "center",
-            marginTop: 10,
+            position: "relative",
+            maxWidth: 680,
+            width: "100%",
+            margin: "0 auto",
+            padding: "24px 24px 0",
           }}
         >
-          {caption}
-        </figcaption>
+          {brand}
+        </div>
       )}
-    </figure>
+
+      <div
+        dir={rtl ? "rtl" : "ltr"}
+        style={{
+          position: "relative",
+          maxWidth: 680,
+          width: "100%",
+          margin: "0 auto",
+          padding: "0 24px 46px",
+        }}
+      >
+        {eyebrow && (
+          <div className="cv-rise" style={{ ...caps, fontSize: 10, color: C.goldLine, marginBottom: 16, animationDelay: "0.05s" }}>
+            {eyebrow}
+          </div>
+        )}
+        <h2
+          className="cv-rise"
+          style={{
+            ...serif,
+            fontSize: "clamp(46px, 12vw, 88px)",
+            lineHeight: 0.92,
+            fontWeight: 500,
+            color: "#FBF7EF",
+            letterSpacing: "-0.028em",
+            margin: 0,
+            textWrap: "balance",
+            animationDelay: "0.14s",
+          }}
+        >
+          {title}
+        </h2>
+        {subtitle && (
+          <p
+            className="cv-rise"
+            style={{
+              ...serif,
+              fontSize: "clamp(17px, 4.4vw, 21px)",
+              fontStyle: "italic",
+              color: "rgba(251,247,239,0.82)",
+              margin: "18px 0 0",
+              lineHeight: 1.5,
+              maxWidth: 430,
+              animationDelay: "0.24s",
+            }}
+          >
+            {subtitle}
+          </p>
+        )}
+        {children && (
+          <div className="cv-rise" style={{ marginTop: 30, animationDelay: "0.34s" }}>
+            {children}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+/* The hero's primary action — the whole reason most residents open this. */
+export function HeroAction({ label, rtl }) {
+  return (
+    <span className="cv-cta" style={{ ...caps, fontSize: 11, color: C.ink }}>
+      {label}
+      <span aria-hidden="true" className="cv-cta-arrow">{rtl ? "←" : "→"}</span>
+    </span>
   );
 }
 

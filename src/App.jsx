@@ -7,7 +7,7 @@ import { translateCategory } from "./cat311.js";
 import ProgramGuideRoute from "./ProgramGuide.jsx";
 import EventsCalendar from "./EventsCalendar.jsx";
 import { upcomingEvents } from "./events.js";
-import { GovBar, CivicMark, SkylineHero, Reveal, LiveDot, StatusChip, ServiceCard, ICONS } from "./civic.jsx";
+import { GovBar, CivicMark, HeroScene, HeroAction, Reveal, LiveDot, StatusChip, ServiceCard, ICONS } from "./civic.jsx";
 
 /* ---------- Phase 2: device-side personalization (no accounts, nothing sent to any server) ---------- */
 const LANG_KEY = "civicone.lang";
@@ -170,6 +170,23 @@ function LangNav({ lang, setLang, t, tone = "dark" }) {
   );
 }
 
+
+/* The wordmark lockup. Sits on the dark hero on the district page and on
+   paper everywhere else, so the two never drift apart. */
+function BrandLockup({ badge, onDark }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 13 }}>
+      <CivicMark size={36} tone={onDark ? C.goldLine : C.gold} />
+      <div style={{ minWidth: 0 }}>
+        <div style={{ ...serif, fontSize: 25, fontWeight: 600, color: onDark ? "#FBF7EF" : C.ink, letterSpacing: "-0.01em", lineHeight: 1.1 }}>
+          Civic One
+        </div>
+        <div style={{ ...caps, fontSize: 9.5, color: onDark ? C.goldLine : C.gold, marginTop: 3 }}>{badge}</div>
+      </div>
+    </div>
+  );
+}
+
 function Masthead({ t, lang, setLang, rtl, badge }) {
   return (
     <>
@@ -178,15 +195,7 @@ function Masthead({ t, lang, setLang, rtl, badge }) {
       </GovBar>
       <div dir={rtl ? "rtl" : "ltr"} style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px" }}>
         <header style={{ paddingTop: 26 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-            <CivicMark size={38} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h1 style={{ ...serif, fontSize: 27, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em", lineHeight: 1.1 }}>
-                Civic One
-              </h1>
-              <div style={{ ...caps, fontSize: 9.5, color: C.gold, marginTop: 3 }}>{badge}</div>
-            </div>
-          </div>
+          <BrandLockup badge={badge} />
           <div style={{ height: 1, background: C.ink, marginTop: 18 }} />
         </header>
       </div>
@@ -241,20 +250,29 @@ function DistrictView({ district, lang, setLang }) {
 
   return (
     <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
-      <Masthead t={t} lang={lang} setLang={setLang} rtl={rtl} badge={featured ? t.district : t.districtFmt.replace("{n}", d)} />
+      <GovBar jurisdiction={t.city} rtl={rtl}>
+        <LangNav lang={lang} setLang={setLang} t={t} tone="dark" />
+      </GovBar>
       <div
         dir={rtl ? "rtl" : "ltr"}
         style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 80px" }}
       >
-        <section style={{ padding: "40px 0 48px", ...fade(0.15) }}>
-          <h2 style={{ ...serif, fontSize: 44, fontWeight: 400, color: C.ink, lineHeight: 1.08, letterSpacing: "-0.015em" }}>
-            {t.hello}
-          </h2>
-          <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, margin: "16px 0 26px", lineHeight: 1.55, maxWidth: 460 }}>
-            {featured ? t.intro : t.introGeneric}
-          </p>
-          <SkylineHero caption={t.skylineCaption} />
-        </section>
+        <HeroScene
+          rtl={rtl}
+          brand={<BrandLockup badge={featured ? t.district : t.districtFmt.replace("{n}", d)} onDark />}
+          eyebrow={null}
+          title={t.hello}
+          subtitle={featured ? t.intro : t.introGeneric}
+          caption={t.skylineCaption}
+        >
+          <Link
+            to={"/district/" + d + "/report"}
+            onClick={() => { if (window.umami) window.umami.track("hero_cta", { district: d }); }}
+            style={{ textDecoration: "none", display: "inline-block" }}
+          >
+            <HeroAction label={t.s1} rtl={rtl} />
+          </Link>
+        </HeroScene>
 
 
         <section style={{ paddingBottom: 64, ...fade(0.3) }}>
