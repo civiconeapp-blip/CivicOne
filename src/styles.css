@@ -151,3 +151,79 @@ textarea:focus-visible {
   }
   .cv-card:hover .cv-card-arrow { transform: none; }
 }
+
+/* ---------- Hero ---------- */
+html, body { overflow-x: hidden; }
+
+.cv-fog-4 { animation: cvFogD 78s linear infinite; opacity: 0.55; }
+@keyframes cvFogD {
+  0%   { transform: translateX(18%); }
+  50%  { transform: translateX(-26%); }
+  100% { transform: translateX(18%); }
+}
+
+/* One orchestrated page-load: eyebrow, headline, subhead, action, staggered */
+.cv-rise {
+  animation: cvRise 0.9s cubic-bezier(0.16, 0.84, 0.34, 1) both;
+}
+@keyframes cvRise {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* Primary action: a gold slab that fills on hover */
+.cv-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 17px 26px;
+  background: #C9B27A;
+  overflow: hidden;
+  transition: color 0.28s ease, box-shadow 0.28s ease;
+  box-shadow: 0 14px 34px -20px rgba(0, 0, 0, 0.9);
+}
+.cv-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #F7F5F0;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.34s cubic-bezier(0.16, 0.84, 0.34, 1);
+}
+[dir="rtl"] .cv-cta::before { transform-origin: right; }
+.cv-cta:hover::before { transform: scaleX(1); }
+.cv-cta > * { position: relative; }
+.cv-cta-arrow { transition: transform 0.28s ease; }
+.cv-cta:hover .cv-cta-arrow { transform: translateX(4px); }
+[dir="rtl"] .cv-cta:hover .cv-cta-arrow { transform: translateX(-4px); }
+
+/* ---------- Cards, with more presence ---------- */
+.cv-card {
+  position: relative;
+  padding: 22px 20px 21px;
+}
+/* A gold edge that grows down the leading side on hover */
+.cv-card::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: #a9863a;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s cubic-bezier(0.16, 0.84, 0.34, 1);
+}
+.cv-card:hover::after,
+.cv-card:focus-within::after { transform: scaleY(1); }
+.cv-card:hover { box-shadow: 0 16px 40px -26px rgba(16, 24, 38, 0.7); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-fog-4 { animation: none; }
+  .cv-rise { animation: none; opacity: 1; transform: none; }
+  .cv-cta, .cv-cta::before, .cv-cta-arrow, .cv-card::after { transition: none; }
+  .cv-cta::before { display: none; }
+  .cv-card::after { transform: scaleY(1); }
+}
