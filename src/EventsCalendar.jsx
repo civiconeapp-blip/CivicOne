@@ -5,14 +5,14 @@ import { DISTRICTS, ACTIVE_DISTRICTS, isActive } from "./districts.js";
 import { upcomingEvents } from "./events.js";
 
 const C = {
-  paper: "#F5F2EA",
-  cream: "#F5F2EA",
-  ink: "#1A1A1A",
-  navy: "#1B2A41",
-  gold: "#A9863A",
-  goldLine: "#C9A961",
-  muted: "#6B675E",
-  hairline: "#D8D3C6",
+  paper: "#FFFFFF",
+  cream: "#EAF1FB",
+  ink: "#1B1B1B",
+  navy: "#14315C",
+  gold: "#0A5CB8",
+  goldLine: "#9CC3F0",
+  muted: "#4A5568",
+  hairline: "#D4DAE1",
 };
 const serif = { fontFamily: "Georgia, 'Times New Roman', serif" };
 const sans = { fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" };
@@ -189,7 +189,7 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
             >
               {rtl ? "→" : "←"} {presetDistrict !== null ? t.r311Back : t.backLink}
             </Link>
-            <h2 style={{ ...serif, fontSize: 36, fontWeight: 400, color: C.ink, lineHeight: 1.1, marginTop: 22 }}>
+            <h2 style={{ ...serif, fontSize: 36, fontWeight: 700, color: C.ink, lineHeight: 1.1, marginTop: 22 }}>
               {t.evLabel}
             </h2>
             <p style={{ ...sans, fontSize: 12, color: C.muted, marginTop: 10 }}>{t.evLangNote}</p>
@@ -275,7 +275,7 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
             )}
 
             {events.length === 0 ? (
-              <p style={{ ...serif, fontStyle: "italic", fontSize: 16, color: C.muted, marginTop: 40, lineHeight: 1.6 }}>
+              <p style={{ ...serif, fontSize: 16, color: C.muted, marginTop: 40, lineHeight: 1.6 }}>
                 {t.evNone}
               </p>
             ) : (
@@ -303,7 +303,7 @@ export default function EventsCalendar({ lang, setLang, presetDistrict = null })
                             </span>
                           )}
                           {e.desc && e.desc[lang] && (
-                            <div style={{ ...serif, fontStyle: "italic", fontSize: 14.5, color: C.muted, marginTop: 6, lineHeight: 1.5 }}>
+                            <div style={{ ...serif, fontSize: 14.5, color: C.muted, marginTop: 6, lineHeight: 1.5 }}>
                               {e.desc[lang]}
                             </div>
                           )}

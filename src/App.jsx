@@ -7,7 +7,7 @@ import { translateCategory } from "./cat311.js";
 import ProgramGuideRoute from "./ProgramGuide.jsx";
 import EventsCalendar from "./EventsCalendar.jsx";
 import { upcomingEvents } from "./events.js";
-import { GovBar, CivicMark, SkylineHero, Reveal, LiveDot, StatusChip, ServiceCard, ICONS } from "./civic.jsx";
+import { SiteHeader, NavLink, CivicMark, HeroBlock, HelpBand, SkylineStrip, ActionButton, Reveal, LiveDot, StatusChip, ServiceCard, ICONS } from "./civic.jsx";
 
 /* ---------- Phase 2: device-side personalization (no accounts, nothing sent to any server) ---------- */
 const LANG_KEY = "civicone.lang";
@@ -54,21 +54,21 @@ function getStoredDistrict() {
 
 /* ---------- Design tokens: "City Briefing" system ---------- */
 const C = {
-  paper: "#F7F5F0",
-  ink: "#101826",
-  navy: "#152B45",
-  gold: "#A9863A",
-  goldLine: "#C9B27A",
-  hairline: "#E4E0D6",
-  muted: "#6B7280",
-  open: "#A6431F",
-  progress: "#8A6414",
-  closed: "#2F6B4F",
-  cream: "#F5F2EA",
+  paper: "#FFFFFF",
+  ink: "#1B1B1B",
+  navy: "#14315C",
+  gold: "#0A5CB8",
+  goldLine: "#9CC3F0",
+  hairline: "#D4DAE1",
+  muted: "#4A5568",
+  open: "#B50909",
+  progress: "#C05600",
+  closed: "#2E7D32",
+  cream: "#EAF1FB",
 };
 
-const serif = { fontFamily: "'Newsreader', serif" };
-const sans = { fontFamily: "'Public Sans', sans-serif" };
+const serif = { fontFamily: "'Rubik', system-ui, sans-serif" };
+const sans = { fontFamily: "'Rubik', system-ui, sans-serif" };
 const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 const caps = {
   ...sans,
@@ -170,27 +170,42 @@ function LangNav({ lang, setLang, t, tone = "dark" }) {
   );
 }
 
-function Masthead({ t, lang, setLang, rtl, badge }) {
+
+/* Wordmark lockup — CivicOne's own mark and name, never the City seal. */
+function BrandLockup({ badge }) {
   return (
-    <>
-      <GovBar jurisdiction={t.city} rtl={rtl}>
-        <LangNav lang={lang} setLang={setLang} t={t} tone="dark" />
-      </GovBar>
-      <div dir={rtl ? "rtl" : "ltr"} style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px" }}>
-        <header style={{ paddingTop: 26 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-            <CivicMark size={38} />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h1 style={{ ...serif, fontSize: 27, fontWeight: 600, color: C.ink, letterSpacing: "-0.01em", lineHeight: 1.1 }}>
-                Civic One
-              </h1>
-              <div style={{ ...caps, fontSize: 9.5, color: C.gold, marginTop: 3 }}>{badge}</div>
-            </div>
-          </div>
-          <div style={{ height: 1, background: C.ink, marginTop: 18 }} />
-        </header>
+    <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+      <CivicMark size={34} tone={C.gold} />
+      <div style={{ minWidth: 0 }}>
+        <div style={{ ...sans, fontSize: 23, fontWeight: 700, color: C.ink, letterSpacing: "-0.02em", lineHeight: 1.05 }}>
+          Civic One
+        </div>
+        {badge && <div style={{ ...sans, fontSize: 12, color: C.muted, marginTop: 1 }}>{badge}</div>}
       </div>
-    </>
+    </div>
+  );
+}
+
+function Masthead({ t, lang, setLang, rtl, badge, districtId }) {
+  return (
+    <SiteHeader
+      rtl={rtl}
+      brand={
+        <Link to={districtId ? "/district/" + districtId : "/"} style={{ textDecoration: "none" }}>
+          <BrandLockup badge={badge} />
+        </Link>
+      }
+      nav={
+        districtId ? (
+          <>
+            <NavLink href={"/district/" + districtId + "/report"}>{t.r311Label}</NavLink>
+            <NavLink href={"/district/" + districtId + "/events"}>{t.evLabel}</NavLink>
+          </>
+        ) : null
+      }
+    >
+      <LangNav lang={lang} setLang={setLang} t={t} tone="light" />
+    </SiteHeader>
   );
 }
 
@@ -241,20 +256,38 @@ function DistrictView({ district, lang, setLang }) {
 
   return (
     <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
-      <Masthead t={t} lang={lang} setLang={setLang} rtl={rtl} badge={featured ? t.district : t.districtFmt.replace("{n}", d)} />
+      <Masthead t={t} lang={lang} setLang={setLang} rtl={rtl} districtId={d} badge={featured ? t.district : t.districtFmt.replace("{n}", d)} />
+
+      <HeroBlock
+        rtl={rtl}
+        title={t.hello}
+        subtitle={featured ? t.intro : t.introGeneric}
+        tileLabel={t.skylineCaption}
+      >
+        <Link
+          to={"/district/" + d + "/report"}
+          onClick={() => { if (window.umami) window.umami.track("hero_cta", { district: d }); }}
+          style={{ textDecoration: "none", display: "inline-block" }}
+        >
+          <ActionButton label={t.s1} rtl={rtl} />
+        </Link>
+      </HeroBlock>
+
+      <HelpBand
+        rtl={rtl}
+        title={t.helpTitle}
+        body={t.r311What}
+        art={<SkylineStrip label={t.skylineCaption} />}
+      >
+        <Link to={"/district/" + d + "/report"} style={{ textDecoration: "none", display: "inline-block" }}>
+          <ActionButton label={t.s1} rtl={rtl} />
+        </Link>
+      </HelpBand>
+
       <div
         dir={rtl ? "rtl" : "ltr"}
-        style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 80px" }}
+        style={{ maxWidth: 900, margin: "0 auto", padding: "48px 24px 80px" }}
       >
-        <section style={{ padding: "40px 0 48px", ...fade(0.15) }}>
-          <h2 style={{ ...serif, fontSize: 44, fontWeight: 400, color: C.ink, lineHeight: 1.08, letterSpacing: "-0.015em" }}>
-            {t.hello}
-          </h2>
-          <p style={{ ...serif, fontSize: 19, fontStyle: "italic", color: C.muted, margin: "16px 0 26px", lineHeight: 1.55, maxWidth: 460 }}>
-            {featured ? t.intro : t.introGeneric}
-          </p>
-          <SkylineHero caption={t.skylineCaption} />
-        </section>
 
 
         <section style={{ paddingBottom: 64, ...fade(0.3) }}>
@@ -273,7 +306,7 @@ function DistrictView({ district, lang, setLang }) {
             )}
           </div>
           {!featured && (
-            <p style={{ ...serif, fontStyle: "italic", fontSize: 15, color: C.muted, marginTop: 20 }}>
+            <p style={{ ...serif, fontSize: 15, color: C.muted, marginTop: 20 }}>
               {t.programsSoon}
             </p>
           )}
@@ -290,7 +323,7 @@ function DistrictView({ district, lang, setLang }) {
               <p style={{ ...sans, fontSize: 12.5, color: "rgba(245,242,234,0.65)", marginTop: 8 }}>{t.hours}</p>
             )}
             {district.neighborhoods && (
-              <p style={{ ...serif, fontStyle: "italic", fontSize: 14.5, color: "rgba(245,242,234,0.6)", marginTop: 24 }}>
+              <p style={{ ...serif, fontSize: 14.5, color: "rgba(245,242,234,0.6)", marginTop: 24 }}>
                 {district.neighborhoods}
               </p>
             )}
@@ -445,7 +478,7 @@ function Report311Page({ district, lang, setLang }) {
 
   return (
     <div style={{ background: C.paper, minHeight: "100vh", ...sans }}>
-      <Masthead t={t} lang={lang} setLang={setLang} rtl={rtl} badge={t.districtFmt.replace("{n}", d)} />
+      <Masthead t={t} lang={lang} setLang={setLang} rtl={rtl} districtId={d} badge={t.districtFmt.replace("{n}", d)} />
       <div dir={rtl ? "rtl" : "ltr"} style={{ maxWidth: 680, margin: "0 auto", padding: "0 24px 80px" }}>
         <main>
           <section style={{ padding: "40px 0 44px" }}>
@@ -455,10 +488,10 @@ function Report311Page({ district, lang, setLang }) {
             >
               {rtl ? "→" : "←"} {t.r311Back}
             </Link>
-            <h2 style={{ ...serif, fontSize: 36, fontWeight: 400, color: C.ink, lineHeight: 1.1, marginTop: 22 }}>
+            <h2 style={{ ...serif, fontSize: 36, fontWeight: 700, color: C.ink, lineHeight: 1.1, marginTop: 22 }}>
               {t.r311Label}
             </h2>
-            <p style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.muted, margin: "14px 0 0", lineHeight: 1.55, maxWidth: 520 }}>
+            <p style={{ ...serif, fontSize: 17, color: C.muted, margin: "14px 0 0", lineHeight: 1.55, maxWidth: 520 }}>
               {t.r311What}
             </p>
           </section>
@@ -471,13 +504,13 @@ function Report311Page({ district, lang, setLang }) {
               {fetchError ? t.ledgerError : featured ? t.ledgerNote : t.ledgerNoteAny.replace("{d}", d)}
             </p>
             {pulse && (
-              <p dir="auto" style={{ ...serif, fontSize: 17, fontStyle: "italic", color: C.ink, margin: "0 0 22px" }}>
+              <p dir="auto" style={{ ...serif, fontSize: 17, color: C.ink, margin: "0 0 22px" }}>
                 {(featured ? t.pulse : t.pulseAny.replace("{d}", d)).replace("{n}", pulse.n.toLocaleString()).replace("{c}", translateCategory(pulse.c, lang))}
               </p>
             )}
 
             {requests === null && (
-              <p style={{ ...serif, fontStyle: "italic", fontSize: 15, color: C.muted }}>{t.loading}</p>
+              <p style={{ ...serif, fontSize: 15, color: C.muted }}>{t.loading}</p>
             )}
 
             {requests && requests.length > 0 && (

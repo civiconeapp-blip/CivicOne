@@ -12,22 +12,22 @@
 import { useEffect, useRef, useState } from "react";
 
 export const C = {
-  paper: "#F7F5F0",
-  ink: "#101826",
-  navy: "#152B45",
-  navySoft: "#24405F",
-  gold: "#A9863A",
-  goldLine: "#C9B27A",
-  hairline: "#E4E0D6",
-  muted: "#6B7280",
-  open: "#A6431F",
-  progress: "#8A6414",
-  closed: "#2F6B4F",
-  cream: "#F5F2EA",
+  paper: "#FFFFFF",
+  ink: "#1B1B1B",
+  navy: "#14315C",
+  navySoft: "#1D4E96",
+  gold: "#0A5CB8",
+  goldLine: "#9CC3F0",
+  hairline: "#D4DAE1",
+  muted: "#4A5568",
+  open: "#B50909",
+  progress: "#C05600",
+  closed: "#2E7D32",
+  cream: "#EAF1FB",
 };
 
-const sans = { fontFamily: "'Public Sans', sans-serif" };
-const serif = { fontFamily: "'Newsreader', serif" };
+const sans = { fontFamily: "'Rubik', system-ui, sans-serif" };
+const serif = { fontFamily: "'Rubik', system-ui, sans-serif" };
 const caps = {
   ...sans,
   textTransform: "uppercase",
@@ -154,203 +154,304 @@ export function CivicMark({ size = 34, tone = C.gold }) {
   );
 }
 
-/* ---------- Government utility bar ----------
-   The thin bar every serious government service opens with. It carries the
-   jurisdiction and the language switcher, which is exactly what a resident
-   who doesn't read English needs first.
+/* ---------- Site header ----------
+   Modelled on SF.gov's masthead: white ground, mark + wordmark on the left,
+   plain-language nav, language control on the right, a rule underneath.
 
-   Note the wording: this says the service is FOR San Francisco residents,
-   never that it is an official City website. CivicOne isn't published by
-   the City, and a bar claiming otherwise would be impersonation — the one
-   govtech convention worth breaking. */
-export function GovBar({ jurisdiction, children, rtl }) {
+   What it deliberately does NOT copy is the City seal, the "SF.gov"
+   wordmark, or any "official website" claim. Matching a public design
+   language is fine; wearing the City's identity on a site the City does
+   not publish would tell residents something untrue about who is
+   answering them. */
+export function SiteHeader({ brand, nav, children, rtl }) {
   return (
-    <div style={{ background: C.navy, borderBottom: `3px solid ${C.gold}` }}>
+    <header style={{ background: "#FFFFFF", borderBottom: `1px solid ${C.hairline}` }}>
       <div
         dir={rtl ? "rtl" : "ltr"}
         style={{
-          maxWidth: 680,
+          maxWidth: 1180,
           margin: "0 auto",
-          padding: "9px 24px",
+          padding: "14px 24px",
           display: "flex",
           alignItems: "center",
-          justifyContent: "space-between",
-          gap: 16,
+          gap: 20,
           flexWrap: "wrap",
         }}
       >
-        <span
-          style={{
-            ...caps,
-            fontSize: 9.5,
-            letterSpacing: "0.16em",
-            color: "rgba(245,242,234,0.82)",
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 9,
-          }}
-        >
-          <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" style={{ flex: "none" }}>
-            <path d="M8 1 L14 4.2 V8 c0 3.4-2.5 5.8-6 7-3.5-1.2-6-3.6-6-7V4.2Z" fill={C.goldLine} />
+        {brand}
+        {nav && (
+          <nav style={{ display: "flex", alignItems: "center", gap: 26, flexWrap: "wrap" }}>
+            {nav}
+          </nav>
+        )}
+        <div style={{ marginInlineStart: "auto", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+          <svg viewBox="0 0 24 24" width="19" height="19" aria-hidden="true" style={{ flex: "none" }}
+               fill="none" stroke={C.ink} strokeWidth="1.6">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M3.2 9.5h17.6M3.2 14.5h17.6M12 3a15 15 0 0 1 0 18A15 15 0 0 1 12 3Z" />
           </svg>
-          {jurisdiction}
-        </span>
-        {children}
+          {children}
+        </div>
       </div>
+    </header>
+  );
+}
+
+export function NavLink({ children, ...rest }) {
+  return (
+    <a
+      {...rest}
+      className="cv-nav"
+      style={{ ...sans, fontSize: 16, fontWeight: 500, color: C.ink, textDecoration: "none", whiteSpace: "nowrap" }}
+    >
+      {children}
+    </a>
+  );
+}
+
+/* ---------- Hero ----------
+   SF.gov's shape: a big plain-language headline and a paragraph on the
+   left, a rounded product tile on the right. Their tile is a photo-ish app
+   badge; ours holds the drawn skyline, so the page still loads nothing
+   from a third-party host. */
+export function HeroBlock({ title, subtitle, tileLabel, children, rtl }) {
+  return (
+    <section style={{ background: "#FFFFFF" }}>
+      <div
+        dir={rtl ? "rtl" : "ltr"}
+        style={{
+          maxWidth: 1180,
+          margin: "0 auto",
+          padding: "clamp(30px, 4.5vw, 52px) 24px clamp(26px, 3.5vw, 40px)",
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1.55fr) minmax(0, 1fr)",
+          gap: "clamp(24px, 5vw, 60px)",
+          alignItems: "center",
+        }}
+        className="cv-hero-grid"
+      >
+        <div>
+          <h1
+            className="cv-rise"
+            style={{
+              ...sans,
+              fontSize: "clamp(34px, 6.6vw, 58px)",
+              lineHeight: 1.08,
+              fontWeight: 700,
+              color: C.ink,
+              letterSpacing: "-0.02em",
+              margin: 0,
+              textWrap: "balance",
+            }}
+          >
+            {title}
+          </h1>
+          {subtitle && (
+            <p
+              className="cv-rise"
+              style={{
+                ...sans,
+                fontSize: "clamp(17px, 2.2vw, 21px)",
+                color: C.ink,
+                margin: "20px 0 0",
+                lineHeight: 1.55,
+                maxWidth: 640,
+                animationDelay: "0.09s",
+              }}
+            >
+              {subtitle}
+            </p>
+          )}
+          {children && (
+            <div className="cv-rise" style={{ marginTop: 28, animationDelay: "0.18s" }}>
+              {children}
+            </div>
+          )}
+        </div>
+        <SkylineTile label={tileLabel} />
+      </div>
+    </section>
+  );
+}
+
+/* The product tile: SF.gov puts a rounded app badge here. Ours is the city
+   at dawn, drawn, with fog crossing it so the page has something alive in
+   it from the first screen. */
+export function SkylineTile({ label }) {
+  return (
+    <div
+      className="cv-tile cv-rise"
+      style={{
+        position: "relative",
+        borderRadius: 18,
+        overflow: "hidden",
+        aspectRatio: "1 / 1",
+        maxWidth: 340,
+        marginInlineStart: "auto",
+        width: "100%",
+        background: "linear-gradient(#0E3D7C 0%, #14509E 52%, #2F6FC0 100%)",
+        boxShadow: "0 18px 44px -28px rgba(11, 45, 92, 0.85)",
+        animationDelay: "0.12s",
+      }}
+    >
+      <svg
+        viewBox="0 0 400 400"
+        preserveAspectRatio="xMidYMid slice"
+        role="img"
+        aria-label={label}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }}
+      >
+        <defs>
+          <linearGradient id="cvTileSky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#0C3468" stopOpacity="0" />
+            <stop offset="100%" stopColor="#8FC2F5" stopOpacity="0.42" />
+          </linearGradient>
+          <linearGradient id="cvTileFog" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
+            <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          </linearGradient>
+          <filter id="cvTileSoft" x="-30%" y="-260%" width="160%" height="620%">
+            <feGaussianBlur stdDeviation="9" />
+          </filter>
+        </defs>
+
+        <rect x="0" y="180" width="400" height="220" fill="url(#cvTileSky)" />
+        <circle cx="300" cy="120" r="34" fill="#FFC15E" opacity="0.9" className="cv-sun" />
+
+        {/* Golden Gate towers — the one silhouette everyone reads instantly */}
+        <g stroke="#F26722" strokeWidth="7" fill="none" strokeLinecap="square">
+          <path d="M78 300 V150 M78 150 h34 M78 178 h34 M78 206 h34" />
+          <path d="M112 300 V150" />
+          <path d="M258 300 V150 M258 150 h34 M258 178 h34 M258 206 h34" />
+          <path d="M292 300 V150" />
+        </g>
+        <g stroke="#F26722" strokeWidth="6" fill="none">
+          <path d="M0 232 Q40 210 78 158" />
+          <path d="M112 158 Q186 268 258 158" />
+          <path d="M292 158 Q346 212 400 232" />
+        </g>
+        <rect x="0" y="296" width="400" height="9" fill="#F26722" />
+
+        {/* Bay + fog */}
+        <rect x="0" y="305" width="400" height="95" fill="#0B2F5E" opacity="0.55" />
+        <g filter="url(#cvTileSoft)">
+          <ellipse className="cv-fog cv-fog-1" cx="140" cy="272" rx="210" ry="15" fill="url(#cvTileFog)" />
+          <ellipse className="cv-fog cv-fog-2" cx="280" cy="292" rx="240" ry="12" fill="url(#cvTileFog)" />
+        </g>
+      </svg>
     </div>
   );
 }
 
-/* ---------- Skyline ----------
-   A San Francisco morning, drawn: Twin Peaks, Sutro Tower, Coit Tower on
-   Telegraph Hill, the Transamerica Pyramid, Salesforce Tower, the Ferry
-   Building clock, and fog rolling through on three layers at different
-   speeds. The fog is the whole point — it's the one thing in the city that
-   is always moving, so the page reads as alive without a carousel or a
-   video autoplaying on someone's data plan. */
-export function SkylineHero({ caption }) {
+
+/* Wide skyline for the pale-blue band — the reference uses a photograph of
+   the city here; this is the drawn equivalent so the page still pulls
+   nothing from a third-party host. */
+export function SkylineStrip({ label }) {
   return (
-    <figure style={{ margin: 0 }}>
+    <div
+      style={{
+        borderRadius: 10,
+        overflow: "hidden",
+        background: "linear-gradient(#BBD9F7 0%, #DCEBFB 62%, #EEF5FD 100%)",
+        border: `1px solid ${C.hairline}`,
+        lineHeight: 0,
+      }}
+    >
+      <svg viewBox="0 0 520 300" preserveAspectRatio="xMidYMid meet" role="img" aria-label={label}
+           style={{ width: "100%", height: "auto", display: "block" }}>
+        <defs>
+          <linearGradient id="cvStripFog" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
+            <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0.85" />
+            <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
+          </linearGradient>
+          <filter id="cvStripSoft" x="-30%" y="-300%" width="160%" height="700%">
+            <feGaussianBlur stdDeviation="8" />
+          </filter>
+        </defs>
+
+        {/* clouds */}
+        <g fill="#FFFFFF" opacity="0.85">
+          <ellipse cx="90" cy="58" rx="46" ry="17" />
+          <ellipse cx="126" cy="50" rx="32" ry="14" />
+          <ellipse cx="392" cy="44" rx="52" ry="16" />
+          <ellipse cx="352" cy="52" rx="30" ry="12" />
+        </g>
+
+        {/* hills */}
+        <path d="M0 236 L70 196 L118 222 L166 186 L232 236 Z" fill="#7FA8CF" opacity="0.5" />
+
+        {/* skyline */}
+        <g fill="#2F5E93">
+          <rect x="150" y="188" width="24" height="60" />
+          <rect x="178" y="170" width="18" height="78" />
+          <path d="M214 248 L230 128 L246 248 Z" />
+          <rect x="228.5" y="112" width="3" height="18" />
+          <rect x="256" y="182" width="22" height="66" />
+          <path d="M292 248 L292 118 Q302 100 312 118 L312 248 Z" />
+          <rect x="322" y="176" width="20" height="72" />
+          <rect x="348" y="196" width="18" height="52" />
+          <rect x="392" y="186" width="16" height="62" />
+          <path d="M392 186 L400 172 L408 186 Z" />
+          <rect x="376" y="212" width="48" height="36" />
+          <rect x="436" y="180" width="22" height="68" />
+          <rect x="464" y="200" width="18" height="48" />
+        </g>
+
+        {/* bay */}
+        <rect x="0" y="248" width="520" height="52" fill="#69A3D8" opacity="0.45" />
+        <g filter="url(#cvStripSoft)">
+          <ellipse className="cv-fog cv-fog-1" cx="150" cy="228" rx="220" ry="12" fill="url(#cvStripFog)" />
+          <ellipse className="cv-fog cv-fog-2" cx="380" cy="244" rx="240" ry="10" fill="url(#cvStripFog)" />
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+/* ---------- Pale-blue band ----------
+   The "We're here to help" panel from the reference: tinted background,
+   artwork on one side, heading + copy + action on the other. */
+export function HelpBand({ title, body, art, children, rtl }) {
+  return (
+    <section style={{ background: C.cream }}>
       <div
+        dir={rtl ? "rtl" : "ltr"}
         style={{
-          position: "relative",
-          width: "100%",
-          overflow: "hidden",
-          background: "linear-gradient(#F3EEE2 0%, #F7F5F0 58%, #F7F5F0 100%)",
-          border: `1px solid ${C.hairline}`,
-          lineHeight: 0,
+          maxWidth: 1180,
+          margin: "0 auto",
+          padding: "clamp(28px, 5vw, 52px) 24px",
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
+          gap: "clamp(22px, 4vw, 48px)",
+          alignItems: "center",
         }}
+        className="cv-hero-grid"
       >
-        {/* meet, not slice: on a narrow phone a cropping fit would cut the sun
-            and Twin Peaks off the sides and leave a wall of buildings. */}
-        <svg
-          viewBox="0 0 800 234"
-          preserveAspectRatio="xMidYMid meet"
-          style={{ width: "100%", height: "auto", display: "block" }}
-          role="img"
-          aria-label={caption}
-        >
-          <defs>
-            <linearGradient id="cvSky" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#EFE4CE" />
-              <stop offset="55%" stopColor="#F5F0E4" />
-              <stop offset="100%" stopColor="#F7F5F0" />
-            </linearGradient>
-            <radialGradient id="cvSun">
-              <stop offset="0%" stopColor="#E8C87A" stopOpacity="0.95" />
-              <stop offset="60%" stopColor="#E8C87A" stopOpacity="0.28" />
-              <stop offset="100%" stopColor="#E8C87A" stopOpacity="0" />
-            </radialGradient>
-            <linearGradient id="cvFog" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="0" />
-              <stop offset="45%" stopColor="#FFFFFF" stopOpacity="0.62" />
-              <stop offset="100%" stopColor="#FFFFFF" stopOpacity="0" />
-            </linearGradient>
-            <filter id="cvFogBlur" x="-30%" y="-120%" width="160%" height="340%">
-              <feGaussianBlur stdDeviation="11" />
-            </filter>
-            <linearGradient id="cvWater" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#C9D4DC" stopOpacity="0.55" />
-              <stop offset="100%" stopColor="#C9D4DC" stopOpacity="0.12" />
-            </linearGradient>
-          </defs>
-
-          <rect x="0" y="0" width="800" height="234" fill="url(#cvSky)" />
-          <g className="cv-sun">
-            <circle cx="648" cy="74" r="62" fill="url(#cvSun)" />
-            <circle cx="648" cy="74" r="15" fill="#E4BE68" opacity="0.9" />
-          </g>
-
-          {/* Twin Peaks and Sutro Tower, far west */}
-          <g opacity="0.32">
-            <path d="M0 196 L58 150 L96 178 L140 142 L196 196 Z" fill={C.navySoft} />
-            <g stroke={C.navySoft} strokeWidth="2" fill="none">
-              <path d="M140 142 L140 108" />
-              <path d="M131 121 L149 121 M128 133 L152 133" strokeWidth="1.5" />
-            </g>
-          </g>
-
-          {/* Bay */}
-          <rect x="0" y="205" width="800" height="29" fill="url(#cvWater)" />
-
-          {/* Far skyline */}
-          <g fill={C.navySoft} opacity="0.34">
-            <rect x="206" y="168" width="26" height="42" />
-            <rect x="238" y="152" width="20" height="58" />
-            <rect x="352" y="160" width="24" height="50" />
-            <rect x="384" y="174" width="30" height="36" />
-            <rect x="536" y="158" width="22" height="52" />
-            <rect x="564" y="170" width="26" height="40" />
-            <rect x="700" y="164" width="30" height="46" />
-            <rect x="736" y="178" width="24" height="32" />
-          </g>
-
-          {/* Telegraph Hill + Coit Tower */}
-          <g fill={C.navy} opacity="0.9">
-            <path d="M96 210 Q140 178 186 210 Z" />
-            <rect x="136" y="150" width="15" height="42" rx="2" />
-            <rect x="134" y="146" width="19" height="7" rx="2" />
-          </g>
-
-          {/* Downtown */}
-          <g fill={C.navy}>
-            <rect x="268" y="150" width="30" height="60" />
-            <rect x="300" y="132" width="22" height="78" />
-            {/* Transamerica Pyramid */}
-            <path d="M352 210 L372 96 L392 210 Z" />
-            <rect x="370.5" y="74" width="3" height="24" />
-            <rect x="404" y="146" width="26" height="64" />
-            {/* Salesforce Tower */}
-            <path d="M452 210 L452 82 Q463 62 474 82 L474 210 Z" />
-            <rect x="486" y="140" width="24" height="70" />
-            <rect x="516" y="158" width="20" height="52" />
-            {/* Ferry Building clock tower */}
-            <rect x="592" y="164" width="20" height="46" />
-            <path d="M592 164 L602 148 L612 164 Z" />
-            <rect x="570" y="188" width="64" height="22" />
-            <rect x="646" y="150" width="28" height="60" />
-            <rect x="678" y="170" width="22" height="40" />
-          </g>
-
-          {/* Lit windows — the city is awake, but only just */}
-          <g fill={C.goldLine} className="cv-windows">
-            <rect x="276" y="162" width="4" height="6" />
-            <rect x="286" y="176" width="4" height="6" />
-            <rect x="308" y="150" width="4" height="6" />
-            <rect x="412" y="160" width="4" height="6" />
-            <rect x="459" y="104" width="4" height="6" />
-            <rect x="465" y="132" width="4" height="6" />
-            <rect x="494" y="158" width="4" height="6" />
-            <rect x="654" y="168" width="4" height="6" />
-            <circle cx="602" cy="172" r="3.4" fill="none" stroke={C.goldLine} strokeWidth="1.2" />
-          </g>
-
-          {/* Ground line, letterpress rule */}
-          <line x1="0" y1="210" x2="800" y2="210" stroke={C.ink} strokeWidth="1.25" opacity="0.55" />
-
-          {/* Fog: three banks, three speeds */}
-          <g filter="url(#cvFogBlur)">
-            <ellipse className="cv-fog cv-fog-1" cx="200" cy="188" rx="300" ry="19" fill="url(#cvFog)" />
-            <ellipse className="cv-fog cv-fog-2" cx="560" cy="201" rx="350" ry="15" fill="url(#cvFog)" />
-            <ellipse className="cv-fog cv-fog-3" cx="380" cy="172" rx="250" ry="11" fill="url(#cvFog)" />
-          </g>
-        </svg>
+        {art}
+        <div>
+          <h2 style={{ ...sans, fontSize: "clamp(26px, 4vw, 38px)", fontWeight: 700, color: C.navy, margin: 0, lineHeight: 1.15 }}>
+            {title}
+          </h2>
+          {body && (
+            <p style={{ ...sans, fontSize: 17, color: C.ink, margin: "16px 0 0", lineHeight: 1.6 }}>{body}</p>
+          )}
+          {children && <div style={{ marginTop: 24 }}>{children}</div>}
+        </div>
       </div>
-      {caption && (
-        <figcaption
-          style={{
-            ...caps,
-            fontSize: 9,
-            letterSpacing: "0.22em",
-            color: C.muted,
-            textAlign: "center",
-            marginTop: 10,
-          }}
-        >
-          {caption}
-        </figcaption>
-      )}
-    </figure>
+    </section>
+  );
+}
+
+/* Primary action, SF.gov style: solid blue, square-ish, no ornament. */
+export function ActionButton({ label, rtl }) {
+  return (
+    <span className="cv-btn" style={{ ...sans, fontSize: 17, fontWeight: 500 }}>
+      {label}
+      <span aria-hidden="true" className="cv-btn-arrow">{rtl ? "←" : "→"}</span>
+    </span>
   );
 }
 
