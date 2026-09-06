@@ -295,6 +295,7 @@ function DistrictView({ district, lang, setLang }) {
           <SectionLabel>{t.servicesLabel}</SectionLabel>
           <div style={{ display: "grid", gap: 12 }}>
             <ServiceRow title={t.s1} desc={t.s1d} rtl={rtl} icon={ICONS.report} to={"/district/" + d + "/report"} delay={0} />
+            <ServiceRow title={t.sDocs} desc={t.sDocsd} rtl={rtl} icon={ICONS.checklist} to="/checklist" delay={0.03} />
             <ServiceRow title={t.s2} desc={t.s2d} rtl={rtl} icon={ICONS.transit} to="/apply/transit" delay={0.05} />
             <ServiceRow title={t.s3} desc={t.s3d} rtl={rtl} icon={ICONS.food} to="/apply/food" delay={0.1} />
             <ServiceRow title={t.s4} desc={t.s4d} rtl={rtl} icon={ICONS.housing} to="/apply/housing" delay={0.15} />

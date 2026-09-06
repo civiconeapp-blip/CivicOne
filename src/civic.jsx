@@ -504,6 +504,13 @@ export function ServiceCard({ title, desc, icon, rtl, onClick, children }) {
 const glyph = { fill: "none", stroke: C.gold, strokeWidth: 1.4, strokeLinecap: "round", strokeLinejoin: "round" };
 
 export const ICONS = {
+  checklist: (
+    <svg viewBox="0 0 24 24" width="19" height="19" {...glyph}>
+      <path d="M8 4.5h8a1.5 1.5 0 0 1 1.5 1.5v13A1.5 1.5 0 0 1 16 20.5H8A1.5 1.5 0 0 1 6.5 19V6A1.5 1.5 0 0 1 8 4.5Z" />
+      <path d="M9.5 9.5h5M9.5 13h5M9.5 16.5h3" />
+      <circle cx="16.6" cy="7.2" r="2.2" fill={C.gold} stroke="none" />
+    </svg>
+  ),
   report: (
     <svg viewBox="0 0 24 24" width="19" height="19" {...glyph}>
       <path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z" />
