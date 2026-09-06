@@ -95,7 +95,7 @@ const STATUS_COLOR = { open: C.open, inProgress: C.progress, closed: C.closed };
 /* ---------- Official service destinations ---------- */
 const LINKS = {
   s1: "https://www.sf311.org",
-  s3: "https://www.getcalfresh.org",
+  s3: "https://benefitscal.com", // was getcalfresh.org; applications moved 2026-06-30
   s4: "https://housing.sfgov.org",
   s7: "https://btwcsc.org/programs/",
 };

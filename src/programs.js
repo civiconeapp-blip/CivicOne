@@ -52,8 +52,12 @@ export const PROGRAMS = [
         desc: "If approved, your Golden State Advantage EBT card arrives by mail. Activate it using the number on the back before your first use.",
       },
     ],
-    officialHref: "https://www.getcalfresh.org",
-    officialLabel: "Start your application at GetCalFresh.org",
+    // GetCalFresh stopped transmitting CalFresh applications on 2026-06-30 and now
+    // only does outreach and chat; CDSS directs applicants to BenefitsCal.
+    // Source: cdss.ca.gov/inforesources/cdss-programs/calfresh-outreach/getcalfresh-transition
+    // verified 2026-09-06
+    officialHref: "https://benefitscal.com",
+    officialLabel: "Start your application at BenefitsCal.com",
     phoneLabel: "SFHSA CalFresh service line",
     phone: "1-855-355-5757", // verified sfhsa.org 2026-07-15
   },
@@ -276,7 +280,7 @@ export const PROGRAM_T = {
         { title: "Complete su entrevista telefónica", desc: "El condado le llamará para confirmar su información. Conteste llamadas de números locales desconocidos durante el período de su solicitud para no perderla." },
         { title: "Reciba su tarjeta EBT", desc: "Si es aprobado, su tarjeta EBT Golden State Advantage llegará por correo. Actívela con el número que aparece al reverso antes de usarla por primera vez." },
       ],
-      officialLabel: "Comience su solicitud en GetCalFresh.org",
+      officialLabel: "Comience su solicitud en BenefitsCal.com",
       phoneLabel: "Línea de CalFresh de SFHSA",
     },
     housing: {
@@ -400,7 +404,7 @@ export const PROGRAM_T = {
         { title: "完成電話面談", desc: "縣政府將來電核實您的資訊。在申請期間請接聽陌生本地號碼的來電,以免錯過。" },
         { title: "領取 EBT 卡", desc: "獲批後,您的 Golden State Advantage EBT 卡將郵寄給您。首次使用前,請撥打卡背面的號碼啟用。" },
       ],
-      officialLabel: "前往 GetCalFresh.org 開始申請",
+      officialLabel: "前往 BenefitsCal.com 開始申請",
       phoneLabel: "SFHSA CalFresh 服務熱線",
     },
     housing: {
@@ -524,7 +528,7 @@ export const PROGRAM_T = {
         { title: "Hoàn thành phỏng vấn qua điện thoại", desc: "Quận sẽ gọi để xác nhận thông tin của bạn. Hãy nghe các cuộc gọi từ số địa phương lạ trong thời gian xét đơn để không bỏ lỡ." },
         { title: "Nhận thẻ EBT", desc: "Nếu được chấp thuận, thẻ EBT Golden State Advantage sẽ được gửi qua bưu điện. Kích hoạt thẻ bằng số điện thoại ở mặt sau trước khi sử dụng lần đầu." },
       ],
-      officialLabel: "Bắt đầu nộp đơn tại GetCalFresh.org",
+      officialLabel: "Bắt đầu nộp đơn tại BenefitsCal.com",
       phoneLabel: "Đường dây CalFresh của SFHSA",
     },
     housing: {
@@ -648,7 +652,7 @@ export const PROGRAM_T = {
         { title: "أكمل المقابلة الهاتفية", desc: "ستتصل بك المقاطعة لتأكيد معلوماتك. أجب على المكالمات من أرقام محلية غير معروفة خلال فترة طلبك حتى لا تفوتك." },
         { title: "استلم بطاقة EBT", desc: "في حال الموافقة، ستصلك بطاقة Golden State Advantage EBT بالبريد. فعّلها باستخدام الرقم الموجود على ظهرها قبل الاستخدام الأول." },
       ],
-      officialLabel: "ابدأ طلبك على GetCalFresh.org",
+      officialLabel: "ابدأ طلبك على BenefitsCal.com",
       phoneLabel: "خط خدمة CalFresh التابع لـ SFHSA",
     },
     housing: {
