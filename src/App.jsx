@@ -5,6 +5,7 @@ import ReportForm from "./ReportForm.jsx";
 import { DISTRICTS, getDistrict, isActive } from "./districts.js";
 import { translateCategory } from "./cat311.js";
 import ProgramGuideRoute from "./ProgramGuide.jsx";
+import ChecklistRoute from "./Checklist.jsx";
 import EventsCalendar from "./EventsCalendar.jsx";
 import { upcomingEvents } from "./events.js";
 import { SiteHeader, NavLink, CivicMark, HeroBlock, HelpBand, SkylineStrip, ActionButton, Reveal, LiveDot, StatusChip, ServiceCard, ICONS } from "./civic.jsx";
@@ -626,6 +627,8 @@ export default function App() {
         <Route path="/district/:id/report" element={<Report311Route lang={lang} setLang={setLang} />} />
         <Route path="/district/:id/events" element={<DistrictEventsRoute lang={lang} setLang={setLang} />} />
         <Route path="/apply/:slug" element={<ProgramGuideRoute lang={lang} setLang={setLang} />} />
+        <Route path="/checklist" element={<ChecklistRoute lang={lang} setLang={setLang} />} />
+        <Route path="/checklist/:programId" element={<ChecklistRoute lang={lang} setLang={setLang} />} />
         <Route path="/events" element={<EventsCalendar lang={lang} setLang={setLang} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
