@@ -15,7 +15,7 @@
  * are translated. Translations should be reviewed by a native speaker.
  */
 
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { PROGRAM_RULES, getRules, recencyLimitFor } from "./programRules.js";
 import { LANGS } from "./i18n.js";
@@ -261,12 +261,30 @@ export default function ChecklistRoute({ lang, setLang }) {
   const t = tr(lang);
   const rtl = lang === "ar";
   const program = programId ? getRules(programId) : null;
-  const [printing] = useState(false);
 
-  const choose = (id) => {
-    if (window.umami) window.umami.track("checklist_generated", { program: id, lang });
-    navigate("/checklist/" + id);
-  };
+  // Count every view of a program checklist, however the resident got here — a tapped
+  // card, a typed URL, a QR code on a flyer, a shared link, or the back button. Firing
+  // on the picker click alone missed all but the first. The ref guards React 18 strict
+  // mode's double-invoke in development so one view is one event.
+  const counted = useRef(null);
+  useEffect(() => {
+    if (!program) return;
+    const key = program.id + "|" + lang;
+    if (counted.current === key) return;
+    counted.current = key;
+    if (window.umami) window.umami.track("checklist_generated", { program: program.id, lang });
+  }, [program, lang]);
+
+  // Count arrivals at the picker separately, so demand for the page is distinguishable
+  // from demand for any one program.
+  const countedIndex = useRef(false);
+  useEffect(() => {
+    if (program || countedIndex.current) return;
+    countedIndex.current = true;
+    if (window.umami) window.umami.track("checklist_opened", { lang });
+  }, [program, lang]);
+
+  const choose = (id) => navigate("/checklist/" + id);
 
   const outside = PROGRAM_RULES.filter((p) => !p.inBenefitsCal);
   const inside = PROGRAM_RULES.filter((p) => p.inBenefitsCal);
@@ -429,7 +447,10 @@ export default function ChecklistRoute({ lang, setLang }) {
             <div className="no-print" style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 28 }}>
               <button
                 type="button"
-                onClick={() => window.print()}
+                onClick={() => {
+                  if (window.umami) window.umami.track("checklist_printed", { program: program.id, lang });
+                  window.print();
+                }}
                 style={{ ...sans, fontSize: 13.5, fontWeight: 600, color: C.navy, background: "transparent", border: `1px solid ${C.navy}`, padding: "11px 18px", minHeight: 44, cursor: "pointer" }}
               >
                 {t.print}
