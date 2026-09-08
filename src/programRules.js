@@ -21,6 +21,12 @@
  * the program" rather than as fact. Never invent a requirement.
  *
  * All entries verified 2026-09-06 unless noted otherwise.
+ *
+ * KNOWN EXCEPTION: the CalFresh entry (added 2026-09-08) has verified
+ * structural fields but an UNVERIFIED document list — SFHSA's pages could not
+ * be reached when it was written. It is the one program here whose
+ * requirements have not been read off an official page. See the comment on
+ * that entry before treating any of its requirements as fact.
  */
 
 /* ------------------------------------------------------------------ *
@@ -82,6 +88,8 @@ const S = {
   sfusd:      "https://www.sfusd.edu/schools/enroll/apply/requirements",
   elfa:       "https://provider.sfdec.org/wp-content/uploads/ELFA-Family-Enrollment-Form-English-FY-25-26-Final-v.2-fillable.pdf",
   caap:       "https://www.sfhsa.org/services/financial-assistance/county-adult-assistance-programs-caap/apply-caap/types-verification-county-adult-assistance-programs-caap",
+  calfresh:   "https://www.sfhsa.org/services/food-nutrition/calfresh",
+  cdss:       "https://www.cdss.ca.gov/inforesources/cdss-programs/calfresh-outreach/getcalfresh-transition",
 };
 
 const V = "2026-09-06";
@@ -320,7 +328,75 @@ export const PROGRAM_RULES = [
     notes: ["Accepted documents are loosely specified and left partly to clinic discretion."],
   },
 
-  /* ---------------- Cash assistance (inside BenefitsCal) ---------------- */
+  /* ---------------- Cash & food assistance (inside BenefitsCal) ---------------- */
+  {
+    /**
+     * CalFresh — the largest food program in the city, and the one most
+     * residents arrive already looking for.
+     *
+     * PROVENANCE, AND WHY THIS ENTRY IS PARTLY UNVERIFIED
+     * SFHSA's CalFresh pages could not be retrieved when this entry was
+     * written (2026-09-08) — the network refused the request, so no official
+     * verification list was read. Under this file's integrity rule that
+     * leaves two kinds of field here, and they must not be confused:
+     *
+     *   - Structural facts below (agency, BenefitsCal routing, phone) carry
+     *     their own dated provenance, inherited from the already-verified
+     *     CalFresh guide in programs.js.
+     *   - Every entry in `requires` is marked status:"unverified" with
+     *     verified:null, because the document classes are drawn from that
+     *     resident-facing guide's plain-language summary, NOT from SFHSA's
+     *     itemized verification list. The checklist therefore renders each
+     *     one as "check with the program before you go" rather than as fact.
+     *
+     * TO FINISH THIS ENTRY: read the SFHSA CalFresh verification page, set
+     * real windows (CalFresh recency limits are not encoded here because
+     * none were confirmed), drop the status flags, and stamp verified.
+     */
+    id: "calfresh",
+    name: "CalFresh — food benefits",
+    agency: "SF Human Services Agency",
+    system: "BenefitsCal",
+    inBenefitsCal: true,
+    // CDSS routes all applicants to BenefitsCal: GetCalFresh stopped
+    // transmitting applications 2026-06-30 and now only does outreach.
+    // Source: S.cdss, verified 2026-09-06 (carried from programs.js)
+    applyHref: "https://benefitscal.com/",
+    phone: "1-855-355-5757", // SFHSA CalFresh service line, verified sfhsa.org 2026-07-15
+    languages: [],
+    languagesStatus: "unverified",
+    requires: [
+      { doc: "photo_id", window: { type: "single" }, status: "unverified", source: S.calfresh, verified: null },
+      {
+        doc: "utility_bill",
+        window: { type: "unspecified", label: "proof of your current address" },
+        note: "A lease, a utility bill, or addressed mail — CalFresh does not publish which it prefers",
+        status: "unverified",
+        source: S.calfresh,
+        verified: null,
+      },
+      {
+        doc: "income_earned",
+        window: { type: "unspecified", label: "proof of income for everyone in the household" },
+        appliesTo: "all household members with income",
+        note: "Pay stubs or benefit award letters. No recency window is encoded because none was confirmed from an official page",
+        status: "unverified",
+        source: S.calfresh,
+        verified: null,
+      },
+    ],
+    // Non-citizen applicants may be asked for immigration paperwork. The
+    // wallet names it so nobody is ambushed at the interview, and then
+    // refuses to hold it — same stance as CAAP.
+    acceptsButWeNeverStore: ["immigration_doc"],
+    notes: [
+      "Document requirements here are unconfirmed — SFHSA's verification page could not be read when this entry was written. Treat every one as 'check before you go'.",
+      "CalFresh also asks for Social Security numbers for the household members applying — not for everyone in the home. Civic One never stores them and offers no slot for them.",
+      "A phone interview is part of the application. Answer calls from unknown local numbers during your application window.",
+      "Most applications take about 30 days; some households qualify for expedited 3-day service.",
+      "Being enrolled in CalFresh confers automatic income eligibility for WIC.", // source: S.wic, verified 2026-09-06
+    ],
+  },
   {
     id: "caap",
     name: "CAAP — County Adult Assistance Programs",
