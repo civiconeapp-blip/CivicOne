@@ -22,11 +22,12 @@
  *
  * All entries verified 2026-09-06 unless noted otherwise.
  *
- * KNOWN EXCEPTION: the CalFresh entry (added 2026-09-08) has verified
- * structural fields but an UNVERIFIED document list — SFHSA's pages could not
- * be reached when it was written. It is the one program here whose
- * requirements have not been read off an official page. See the comment on
- * that entry before treating any of its requirements as fact.
+ * SOURCE NOTE: every program here is verified against the agency's own page,
+ * except CalFresh (added 2026-09-08), which is verified against the SAWS 2
+ * PLUS application form instead — a statewide CDSS form shared by CalFresh,
+ * cash aid and Medi-Cal, so a few of its lines are scoped to programs other
+ * than CalFresh. The entry honours those scopes; read its comment before
+ * extending it.
  */
 
 /* ------------------------------------------------------------------ *
@@ -90,9 +91,16 @@ const S = {
   caap:       "https://www.sfhsa.org/services/financial-assistance/county-adult-assistance-programs-caap/apply-caap/types-verification-county-adult-assistance-programs-caap",
   calfresh:   "https://www.sfhsa.org/services/food-nutrition/calfresh",
   cdss:       "https://www.cdss.ca.gov/inforesources/cdss-programs/calfresh-outreach/getcalfresh-transition",
+  // Not a URL, unlike every other source here: this one is the application
+  // form itself, read directly. No cdss.ca.gov link is cited because the
+  // page was never fetched — only the document was.
+  saws:       "SAWS 2 PLUS (4/15) — CDSS combined application for CalFresh, Cash Aid and/or Medi-Cal",
 };
 
 const V = "2026-09-06";
+
+/** CalFresh was verified two days later, off the SAWS 2 PLUS form itself. */
+const V_SAWS = "2026-09-08";
 
 export const PROGRAM_RULES = [
   /* ---------------- Energy & utilities ---------------- */
@@ -334,24 +342,19 @@ export const PROGRAM_RULES = [
      * CalFresh — the largest food program in the city, and the one most
      * residents arrive already looking for.
      *
-     * PROVENANCE, AND WHY THIS ENTRY IS PARTLY UNVERIFIED
-     * SFHSA's CalFresh pages could not be retrieved when this entry was
-     * written (2026-09-08) — the network refused the request, so no official
-     * verification list was read. Under this file's integrity rule that
-     * leaves two kinds of field here, and they must not be confused:
+     * SOURCE, AND ITS ONE LIMIT
+     * Verified against the SAWS 2 PLUS (4/15) application form itself — the
+     * statewide CDSS form that CalFresh, cash aid and Medi-Cal all share —
+     * rather than an SFHSA page, because sfhsa.org could not be reached. The
+     * form's "Proof Needed to Get Benefits" list is itemized and explicit, so
+     * these requirements are real, not inferred.
      *
-     *   - Structural facts below (agency, BenefitsCal routing, phone) carry
-     *     their own dated provenance, inherited from the already-verified
-     *     CalFresh guide in programs.js.
-     *   - Every entry in `requires` is marked status:"unverified" with
-     *     verified:null, because the document classes are drawn from that
-     *     resident-facing guide's plain-language summary, NOT from SFHSA's
-     *     itemized verification list. The checklist therefore renders each
-     *     one as "check with the program before you go" rather than as fact.
-     *
-     * TO FINISH THIS ENTRY: read the SFHSA CalFresh verification page, set
-     * real windows (CalFresh recency limits are not encoded here because
-     * none were confirmed), drop the status flags, and stamp verified.
+     * The limit worth knowing: that list is written for the COMBINED
+     * application, and only some lines are scoped to one program. Where the
+     * form scopes something ("Birth certificates for everyone applying for
+     * cash aid"), we honour the scope and leave it out. Where it doesn't, the
+     * requirement is recorded as the form states it. San Francisco may ask
+     * for more on top; nothing here is a county-specific list.
      */
     id: "calfresh",
     name: "CalFresh — food benefits",
@@ -365,35 +368,61 @@ export const PROGRAM_RULES = [
     phone: "1-855-355-5757", // SFHSA CalFresh service line, verified sfhsa.org 2026-07-15
     languages: [],
     languagesStatus: "unverified",
+    // The county must give you at least 10 days to produce proof — so a
+    // missing document is a deadline, not a rejection.
+    responseDays: 10,
     requires: [
-      { doc: "photo_id", window: { type: "single" }, status: "unverified", source: S.calfresh, verified: null },
+      {
+        doc: "photo_id",
+        window: { type: "single" },
+        note: "Driver's license, State ID card, or passport",
+        source: S.saws,
+        verified: V_SAWS,
+      },
       {
         doc: "utility_bill",
-        window: { type: "unspecified", label: "proof of your current address" },
-        note: "A lease, a utility bill, or addressed mail — CalFresh does not publish which it prefers",
-        status: "unverified",
-        source: S.calfresh,
-        verified: null,
+        window: { type: "single" },
+        note: "Proof of where you live — a rental agreement, or a current bill with your address on it",
+        source: S.saws,
+        verified: V_SAWS,
       },
       {
+        // The one hard recency window on this form, and the reason CalFresh
+        // belongs in the wallet at all: 30 days is computable, so the
+        // checklist can tell a resident their stub goes stale.
         doc: "income_earned",
-        window: { type: "unspecified", label: "proof of income for everyone in the household" },
-        appliesTo: "all household members with income",
-        note: "Pay stubs or benefit award letters. No recency window is encoded because none was confirmed from an official page",
-        status: "unverified",
-        source: S.calfresh,
-        verified: null,
+        window: { type: "days", value: 30 },
+        appliesTo: "everyone in the household with earned income",
+        note: "Recent pay stubs or a work statement from an employer. If self-employed, income and expenses or tax records instead",
+        source: S.saws,
+        verified: V_SAWS,
+      },
+      {
+        doc: "bank_statement",
+        window: { type: "unspecified", label: "recent bank statements" },
+        appliesTo: "all people in the household",
+        note: "Money in the bank for everyone in the household",
+        source: S.saws,
+        verified: V_SAWS,
+      },
+      {
+        doc: "benefits_letter",
+        window: { type: "unspecified", label: "proof of unearned income" },
+        note: "Unemployment, SSI, Social Security, Veteran's benefits, child support, worker's compensation, school grants or loans, or rental income",
+        source: S.saws,
+        verified: V_SAWS,
       },
     ],
-    // Non-citizen applicants may be asked for immigration paperwork. The
-    // wallet names it so nobody is ambushed at the interview, and then
-    // refuses to hold it — same stance as CAAP.
+    // The form asks for immigration status ONLY from legal noncitizens who
+    // are themselves applying. We name it so nobody is ambushed at the
+    // interview, and still never hold it.
     acceptsButWeNeverStore: ["immigration_doc"],
     notes: [
-      "Document requirements here are unconfirmed — SFHSA's verification page could not be read when this entry was written. Treat every one as 'check before you go'.",
-      "CalFresh also asks for Social Security numbers for the household members applying — not for everyone in the home. Civic One never stores them and offers no slot for them.",
-      "A phone interview is part of the application. Answer calls from unknown local numbers during your application window.",
-      "Most applications take about 30 days; some households qualify for expedited 3-day service.",
+      "Keep your interview even if you do not have every document. The county can help you get proof, and must give you at least 10 days to provide it.",
+      "Birth certificates are required only for people applying for cash aid — not for CalFresh. The combined application asks for them anyway.",
+      "CalFresh also asks for Social Security numbers for everyone applying for aid. Civic One never stores them and offers no slot for them. Certain noncitizens applying on the basis of domestic violence, crime prosecution or trafficking may not need an SSN or immigration proof at all.",
+      "These extra proofs are optional, but each one can raise your monthly benefit: housing costs, phone and utility costs, medical expenses for anyone 60 or older or disabled, child or adult care costs, and child support you pay. Not giving proof of an expense is treated as not having it.",
+      "CalFresh is decided within 30 days. If your food will run out within three days you may qualify for Expedited Service and get benefits within 3 days.",
       "Being enrolled in CalFresh confers automatic income eligibility for WIC.", // source: S.wic, verified 2026-09-06
     ],
   },
